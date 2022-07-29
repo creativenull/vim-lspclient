@@ -84,5 +84,5 @@ export def OpenLogFilepath(): void
 enddef
 
 export def ClearLogContents(): void
-  writefile([null], logFilepath, 'w')
+  writefile([], logFilepath, 'w')
 enddef
