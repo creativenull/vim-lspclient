@@ -27,7 +27,7 @@ Ref: [LSP Specification](https://microsoft.github.io/language-server-protocol/sp
 ## Installation
 ### Requirements
 
-These can also be checked with `:LSPClientHealthCheck`
+These can also be checked with `:LSPClientCheckHealth`
 
 + Vim [v8.2.4758](https://github.com/vim/vim/tree/v8.2.4758) and up is required.
 + `+channel`

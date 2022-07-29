@@ -9,31 +9,13 @@ if exists('g:loaded_lspclient')
   finish
 endif
 
-def CheckHealth(): void
-  const patch = 'patch-8.2.4758'
-  var errlist = []
+import autoload 'lspclient/vim/checkhealth.vim'
+import autoload 'lspclient/logger.vim'
 
-  if !has(patch)
-    errlist->add(patch)
-  elseif !has('channel')
-    errlist->add('channel')
-  elseif !has('job')
-    errlist->add('job')
-  elseif !has('timers')
-    errlist->add('timers')
-  endif
+command! LSPClientCheckHealth call checkhealth.Info()
 
-  if errlist->len() > 0
-    echoerr '[LSPCLIENT] Following are not available for the plugin to work properly: ' .. errlist->join(',')
-  else
-    echomsg '[LSPCLIENT] All Checks Passed!'
-  endif
-enddef
-
-command! LSPClientHealthCheck call <SID>CheckHealth()
-
-command! LSPClientLog call lspclient#logger#OpenLogFilepath()
-command! LSPClientLogClear call lspclient#logger#ClearLogContents()
+command! LSPClientLog call logger.OpenLogFilepath()
+command! LSPClientLogClear call logger.ClearLogContents()
 command! LSPClientDiagnostics echom 'WIP!'
 
 g:loaded_lspclient = true
