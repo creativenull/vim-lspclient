@@ -1,7 +1,7 @@
 vim9script
 
-import './core/protocol.vim' as proto
-import './core/log.vim'
+import './logger.vim'
+import './core/protocol.vim'
 import './features/workspace/configuration.vim'
 import './features/window/message.vim'
 
@@ -11,7 +11,7 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
   endif
 
   if request.method == 'client/registerCapability'
-    log.LogInfo(request.method .. ' : ' .. request->string())
+    logger.LogInfo(request.method .. ' : ' .. request->string())
   endif
 
   # Window

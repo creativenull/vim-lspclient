@@ -6,9 +6,9 @@ vim9script
 const logFilepath = expand('~/.cache/vim/lspclient.log')
 const echoPrefix = '[LSPCLIENT]'
 const level = {
-  ERROR: 'Error',
-  DEBUG: 'Debug',
-  INFO: 'Info',
+  ERROR: 'ERROR',
+  DEBUG: 'DEBUG',
+  INFO: 'INFO',
 }
 
 # Get the current timestamp format for logfiles
@@ -81,4 +81,8 @@ export const LogError = (msg: string): void => {
 # ---
 export def OpenLogFilepath(): void
   execute printf('silent edit %s', logFilepath)
+enddef
+
+export def ClearLogContents(): void
+  writefile([null], logFilepath, 'w')
 enddef

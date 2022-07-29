@@ -32,8 +32,8 @@ enddef
 
 command! LSPClientHealthCheck call <SID>CheckHealth()
 
-command! LSPClientLog call lspclient#core#log#OpenLogFilepath()
-command! LSPClientLogClear call execute('!echo -n "" > ~/.cache/vim/lspclient.log')
+command! LSPClientLog call lspclient#logger#OpenLogFilepath()
+command! LSPClientLogClear call lspclient#logger#ClearLogContents()
 command! LSPClientDiagnostics echom 'WIP!'
 
 g:loaded_lspclient = true

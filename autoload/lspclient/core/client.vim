@@ -2,9 +2,9 @@ vim9script
 
 # Base functions to initialize and shutdown the LSP client
 
+import '../fs.vim'
+import '../logger.vim'
 import './protocol.vim'
-import './fs.vim'
-import './log.vim'
 
 const locale = 'en-US'
 const clientInfo = { name: 'Vim', version: v:versionlong->string() }
@@ -61,36 +61,36 @@ export def Initialize(
     capabilities: capabilities,
   }, opts.callback)
 
-  log.LogInfo('LSP Issue Initialize with capabilities: ' .. capabilities->string())
-  log.LogInfo('LSP Issue Initialize with initializationOptions: ' .. initializationOptions->string())
+  logger.LogInfo('LSP Issue Initialize with capabilities: ' .. capabilities->string())
+  logger.LogInfo('LSP Issue Initialize with initializationOptions: ' .. initializationOptions->string())
 enddef
 
 # Notify the server when client has initialized
 export def Initialized(ch: channel): void
   protocol.NotifyAsync(ch, 'initialized')
-  log.LogInfo('LSP Initialized!')
+  logger.LogInfo('LSP Initialized!')
 enddef
 
 # Notify the server when the client has exited
 def OnShutdown(ch: channel, response: dict<any>): void
   if response->empty()
-    log.LogError('Empty Response')
+    logger.LogError('Empty Response')
 
     return
   endif
 
   if response->has_key('error')
-    log.LogError(response.error)
+    logger.LogError(response.error)
 
     return
   endif
 
   protocol.NotifyAsync(ch, 'exit')
-  log.LogInfo('LSP Exit')
+  logger.LogInfo('LSP Exit')
 enddef
 
 # Request a client shutdown to the server
 export def Shutdown(ch: channel): void
   protocol.RequestAsync(ch, 'shutdown', {}, OnShutdown)
-  log.LogInfo('LSP Issue Shutdown')
+  logger.LogInfo('LSP Issue Shutdown')
 enddef

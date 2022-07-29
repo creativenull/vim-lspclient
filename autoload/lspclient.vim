@@ -2,8 +2,8 @@ vim9script
 
 import './lspclient/core/client.vim'
 import './lspclient/core/document.vim'
-import './lspclient/core/fs.vim'
-import './lspclient/core/log.vim'
+import './lspclient/fs.vim'
+import './lspclient/logger.vim'
 import './lspclient/router.vim'
 import './lspclient/config.vim'
 
@@ -167,14 +167,14 @@ export def LspStartServer(id: string): void
 
     if response->empty()
       errmsg = 'Empty Response'
-      log.LogError(errmsg)
+      logger.LogError(errmsg)
 
       return
     endif
 
     if response->has_key('error')
       errmsg = response.error->string()
-      log.LogError(errmsg)
+      logger.LogError(errmsg)
 
       return
     endif
@@ -196,16 +196,16 @@ export def LspStartServer(id: string): void
   enddef
 
   def OnStdout(ch: channel, request: dict<any>): void
-    log.LogInfo('STDOUT : ' .. request->string())
+    logger.LogInfo('STDOUT : ' .. request->string())
     router.HandleServerRequest(ch, request, GetConfig(id))
   enddef
 
   def OnStderr(ch: channel, data: any): void
-    log.LogError('STDERR : ' .. data->string())
+    logger.LogError('STDERR : ' .. data->string())
   enddef
 
   def OnExit(ch: channel, data: any): void
-    log.LogInfo('Channel Exiting')
+    logger.LogInfo('Channel Exiting')
   enddef
 
   const jobOpts = {
@@ -219,7 +219,7 @@ export def LspStartServer(id: string): void
 
   const lspClientConfig = GetConfig(id)
 
-  log.PrintInfo('Starting LSP Server: ' .. lspClientConfig.name)
+  logger.PrintInfo('Starting LSP Server: ' .. lspClientConfig.name)
 
   const job = job_start(lspClientConfig.cmd, jobOpts)
   const channel = job_getchannel(job)
@@ -228,7 +228,7 @@ export def LspStartServer(id: string): void
   SetChannel(id, channel)
 
   # Start the initialization process
-  log.LogInfo('<======= LSP CLIENT LOG =======>')
+  logger.LogInfo('<======= LSP CLIENT LOG =======>')
   client.Initialize(GetChannel(id), {
     lspClientConfig: lspClientConfig,
     callback: OnInitialize,
@@ -240,7 +240,7 @@ export def LspStopServer(id: string): void
     return
   endif
 
-  log.LogInfo('<======= LSP CLIENT SHUTDOWN PHASE =======>')
+  logger.LogInfo('<======= LSP CLIENT SHUTDOWN PHASE =======>')
   client.Shutdown(GetChannel(id))
 enddef
 
@@ -251,8 +251,8 @@ export def Create(partialLspClientConfig: dict<any>): void
 
   const errmsg = config.ValidateLspClientConfig(lspClientConfig)
   if !errmsg->empty()
-    log.PrintError(errmsg)
-    log.LogError(errmsg)
+    logger.PrintError(errmsg)
+    logger.LogError(errmsg)
 
     return
   endif
