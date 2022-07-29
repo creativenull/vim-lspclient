@@ -28,6 +28,11 @@ def MakeClientCapabilities(partialCapabilities = null_dict): dict<any>
     },
     window: {
       workDoneProgress: true,
+      showMessage: {
+        messageActionItem: {
+          additionalPropertiesSupport: true,
+        },
+      },
     },
   }
 
