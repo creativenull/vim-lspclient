@@ -6,9 +6,9 @@ vim9script
 const logFilepath = expand('~/.cache/vim/lspclient.log')
 const echoPrefix = '[LSPCLIENT]'
 const level = {
-  ERROR: 'ERROR',
-  DEBUG: 'DEBUG',
-  INFO: 'INFO',
+  ERROR: 'Error',
+  DEBUG: 'Debug',
+  INFO: 'Info',
 }
 
 # Get the current timestamp format for logfiles
@@ -37,12 +37,12 @@ def Render(levelType: string, msg: string): string
 enddef
 
 # Logs to be printed to :messages
-def Print(levelType: string, msg: string): void
+export def Print(levelType: string, msg: string): void
   echom printf('%s %s', echoPrefix, Render(levelType, msg))
 enddef
 
 # Log to be writted to logfiles
-def Log(levelType: string, msg: string): void
+export def Log(levelType: string, msg: string): void
   EnsureLogFile()
   WriteLogFile(printf('[%s] %s', GetTime(), Render(levelType, msg)))
 enddef
