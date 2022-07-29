@@ -51,7 +51,7 @@ git clone https://github.com/creativenull/vim-lspclient.git ~/.vim/pack/creative
 Example for `tsserver`:
 
 ```vim
-call lspclient#MakeLspClient({
+call lspclient#Create({
   \ 'name': 'tsserver',
   \ 'cmd': ['typescript-language-server', '--stdio'],
   \ 'filetypes': ['typescript', 'typescriptreact', 'javascript', 'javascriptreact'],

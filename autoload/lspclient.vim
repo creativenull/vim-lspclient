@@ -244,7 +244,7 @@ export def LspStopServer(id: string): void
   client.Shutdown(GetChannel(id))
 enddef
 
-export def MakeLspClient(partialLspClientConfig: dict<any>): void
+export def Create(partialLspClientConfig: dict<any>): void
   # Merge and validate the client config and fail the setup
   # if invalidated
   const lspClientConfig = config.MergeLspClientConfig(partialLspClientConfig)
