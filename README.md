@@ -1,6 +1,7 @@
 # vim-lspclient (WIP)
 
-A highly experimental LSP client for vim. Written in vim9script.
+A highly experimental LSP client for vim using the builtin [LSP channel mode](https://vimhelp.org/channel.txt.html#language-server-protocol).
+Written in `vim9script`.
 
 ## Motivation
 
@@ -9,7 +10,7 @@ unique besides just building web applications.
 
 ## What works
 
-Ref: [LSP protocol spec](https://microsoft.github.io/language-server-protocol/specifications/specification-current)
+Ref: [LSP Specification](https://microsoft.github.io/language-server-protocol/specifications/specification-current)
 
 + Server Initialization (`initialize`, `initialized`)
 + Document updates:
@@ -24,14 +25,22 @@ Ref: [LSP protocol spec](https://microsoft.github.io/language-server-protocol/sp
 + Server Shutdown (`shutdown`, `exit`)
 
 ## Installation
+### Requirements
 
-For vim-plug and similar plugin managers:
+These can also be checked with `:LSPClientHealthCheck`
+
++ Vim [v8.2.4758](https://github.com/vim/vim/tree/v8.2.4758) and up is required.
++ `+channel`
++ `+job`
++ `+timers`
+
+### Install via plugin manager
 
 ```vim
 Plug 'creativenull/vim-lspclient'
 ```
 
-Without a plugin manager:
+### Install without plugin manager
 
 ```
 git clone https://github.com/creativenull/vim-lspclient.git ~/.vim/pack/creativenull/start/vim-lspclient
