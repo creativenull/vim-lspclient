@@ -2,53 +2,23 @@ vim9script
 
 # Base functions to initialize and shutdown the LSP client
 
+import './protocol.vim'
+import './capabilities.vim'
 import '../fs.vim'
 import '../logger.vim'
-import './protocol.vim'
 
 const locale = 'en-US'
-const clientInfo = { name: 'Vim', version: v:versionlong->string() }
-
-def MakeClientCapabilities(partialCapabilities = null_dict): dict<any>
-  const defaults = {
-    workspace: {
-      applyEdit: true,
-      didChangeConfiguration: {
-        dynamicRegistration: false,
-      },
-      configuration: true,
-    },
-    textDocument: {
-      synchronization: {
-        dynamicRegistration: false,
-        willSave: true,
-        willSaveWaitUntil: true,
-        didSave: true,
-      },
-    },
-    window: {
-      workDoneProgress: true,
-      showMessage: {
-        messageActionItem: {
-          additionalPropertiesSupport: true,
-        },
-      },
-    },
-  }
-
-  if partialCapabilities->empty()
-    return defaults
-  endif
-
-  return defaults->extendnew(partialCapabilities)
-enddef
+const clientInfo = {
+  name: 'Vim',
+  version: v:versionlong->string(),
+}
 
 # Request intialization of the client to the server
 export def Initialize(
   ch: channel,
   opts = { lspClientConfig: null_dict, callback: null_function }
 ): void
-  const capabilities = MakeClientCapabilities(opts.lspClientConfig.capabilities)
+  const clientCapabilities = capabilities.Make(opts.lspClientConfig.capabilities)
   const initializationOptions = opts.lspClientConfig.initOptions
 
   protocol.RequestAsync(ch, 'initialize', {
@@ -58,10 +28,10 @@ export def Initialize(
     rootUri: fs.GetProjectRootUri(),
     trace: 'verbose',
     initializationOptions: initializationOptions,
-    capabilities: capabilities,
+    capabilities: clientCapabilities,
   }, opts.callback)
 
-  logger.LogInfo('LSP Issue Initialize with capabilities: ' .. capabilities->string())
+  logger.LogInfo('LSP Issue Initialize with capabilities: ' .. clientCapabilities->string())
   logger.LogInfo('LSP Issue Initialize with initializationOptions: ' .. initializationOptions->string())
 enddef
 
