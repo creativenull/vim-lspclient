@@ -9,6 +9,10 @@ export def FileToUri(filepath: string): string
   return printf('file://%s', filepath)
 enddef
 
+export def UriToFile(uri: string): string
+  return uri[7 :]
+enddef
+
 export def GetProjectRootUri(): string
   return FileToUri(getcwd())
 enddef

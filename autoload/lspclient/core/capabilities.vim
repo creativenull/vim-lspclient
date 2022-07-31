@@ -1,5 +1,9 @@
 vim9script
 
+import './types.vim'
+
+const DiagnosticTag = types.DiagnosticTag
+
 export def Make(partialCapabilities = null_dict): dict<any>
   const defaults = {
     workspace: {
@@ -15,6 +19,15 @@ export def Make(partialCapabilities = null_dict): dict<any>
         willSave: true,
         willSaveWaitUntil: true,
         didSave: true,
+      },
+      publishDiagnostics: {
+        relatedInformation: true,
+        tagSupport: {
+          valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated],
+        },
+        versionSupport: true,
+        codeDescriptionSupport: true,
+        dataSupport: true,
       },
     },
     window: {

@@ -2,12 +2,17 @@ vim9script
 
 import './logger.vim'
 import './core/protocol.vim'
+import './features/language/publish_diagnostics.vim'
 import './features/workspace/configuration.vim'
 import './features/window/message.vim'
 
 export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
   if request.method == 'workspace/configuration'
     configuration.HandleConfigurationRequest(ch, request, lspClientConfig)
+  endif
+
+  if request.method == 'textDocument/publishDiagnostics'
+    publish_diagnostics.HandlePublishDiagnosticsNotification(request, lspClientConfig)
   endif
 
   if request.method == 'client/registerCapability'
