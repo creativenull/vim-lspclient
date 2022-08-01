@@ -20,3 +20,9 @@ export const DiagnosticSeverity = {
   3: 'I',
   4: 'H',
 }
+
+export const PositionEncodingKind = {
+  UTF8: 'utf-8',
+  UTF16: 'utf-16',
+  UTF32: 'utf-32',
+}
