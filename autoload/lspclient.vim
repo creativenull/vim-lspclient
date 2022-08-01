@@ -305,3 +305,7 @@ export def Create(partialLspClientConfig: dict<any>): void
     },
   ])
 enddef
+
+export def Info(): void
+  logger.PrintInfo('Registered servers: ' .. lspClients->keys()->join(','))
+enddef

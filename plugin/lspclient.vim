@@ -11,11 +11,13 @@ endif
 
 import autoload 'lspclient/vim/checkhealth.vim'
 import autoload 'lspclient/logger.vim'
+import autoload 'lspclient.vim'
 
 command! LSPClientCheckHealth call checkhealth.Info()
 
 command! LSPClientLog call logger.OpenLogFilepath()
 command! LSPClientLogClear call logger.ClearLogContents()
+command! LSPClientInfo call lspclient.Info()
 command! LSPClientDiagnostics echom 'WIP!'
 
 highlight LspClientPopupBorder guifg=#eeeeee guibg=NONE
