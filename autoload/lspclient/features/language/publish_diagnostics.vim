@@ -3,6 +3,7 @@ vim9script
 import '../../logger.vim'
 import '../../fs.vim'
 import '../../core/types.vim'
+import '../../vim/popup.vim'
 
 const DiagnosticSeverity = types.DiagnosticSeverity
 
@@ -18,8 +19,8 @@ export def HandlePublishDiagnosticsNotification(request: any, lspClientConfig: d
 
   # Set location-list
   if diagnostics->empty()
-    # setloclist(0, [], 'r')
-    logger.PrintInfo('publishDiagnostics: []')
+    setloclist(0, [], 'r')
+    # logger.PrintInfo('publishDiagnostics: []')
 
     return
   endif
@@ -30,11 +31,12 @@ export def HandlePublishDiagnosticsNotification(request: any, lspClientConfig: d
     col: diagnostic.range.start.character + 1,
     end_lnum: diagnostic.range.end.line + 1,
     end_col: diagnostic.range.end.character + 1,
-    nr: diagnostic->get('code', 0),
+    nr: diagnostic->get('code', 0)->type() == v:t_number ? diagnostic.code : 0,
     type: DiagnosticSeverity[diagnostic.severity],
     text: MakeLocListText(diagnostic),
   }))
 
-  # setloclist(0, loclist, 'r')
-  logger.PrintInfo('publishDiagnostics: ' .. loclist->string())
+  setloclist(0, loclist, 'r')
+  popup.Notify('Error', printf('Found %s problems', loclist->len()))
+  # logger.PrintInfo('publishDiagnostics: ' .. loclist->string())
 enddef
