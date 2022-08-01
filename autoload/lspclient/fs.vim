@@ -13,8 +13,20 @@ export def UriToFile(uri: string): string
   return uri[7 :]
 enddef
 
+export def GetProjectRoot(extendPath: string = ''): string
+  if !extendPath->empty()
+    if extendPath[0] == '/'
+      return printf('%s%s', getcwd(), extendPath)
+    endif
+
+    return printf('%s/%s', getcwd(), extendPath)
+  endif
+
+  return getcwd()
+enddef
+
 export def GetProjectRootUri(): string
-  return FileToUri(getcwd())
+  return FileToUri(GetProjectRoot())
 enddef
 
 export def GetCurrentFileUri(): string
