@@ -79,12 +79,12 @@ export def DocumentDidSave(id: string, buf: number): void
   endif
 enddef
 
-export def DocumentDidChange(id: string, buf: number): void
+export def DocumentDidChange(id: string, buf: number, changes: list<any>): void
   if buf->getbufvar('&modified')
     document.NotifyDidChange(GetChannel(id), {
       uri: fs.FileToUri(buf->bufname()),
       version: buf->getbufvar('changedtick'),
-      contents: fs.GetBufferContents(buf),
+      changes: changes,
     })
   endif
 enddef
@@ -103,16 +103,35 @@ export def DocumentDidOpen(id: string): void
     })
 
     # Subscribe to buffer changes
-    def OnChange(bufnr: number, start: any, end: any, added: any, changes: any)
-      DocumentDidChange(id, bufnr)
+    def OnChange(bufnr: number, start: number, end: number, added: number, changes: list<any>)
+      const endChar = start->getline()->len() - 1
+
+      var contentChanges = [
+        {
+          range: {
+            start: {
+              line: start - 1,
+              character: 0,
+            },
+            end: {
+              line: start - 1,
+              character: endChar == -1 ? 0 : endChar,
+            },
+          },
+          text: getline(start),
+        },
+        { text: fs.GetBufferContents(bufnr) },
+      ]
+
+      DocumentDidChange(id, bufnr, contentChanges)
     enddef
 
-    const ref = listener_add(OnChange, buf)
+    const ref = buf->listener_add(OnChange)
 
     # Track this document lifecycle, include any other refs
     TrackDocument(id, { bufnr: buf, listenerRef: ref })
 
-    # Register for cleanup
+    # Buffer events to be sent to LSP server, until closed
     autocmd_add([
       {
         group: GetEventGroup(id),

@@ -7,6 +7,7 @@ vim9script
 # interface Document {
 #   filepath?: string;
 #   filetype?: string;
+#   changes?: list<any>;
 #   version: number;
 #   contents: string;
 # }
@@ -34,9 +35,10 @@ export def NotifyDidChange(ch: channel, document: dict<any>): void
     textDocument: {
       version: document.version,
     },
-    contentChanges: [ { text: document.contents } ],
+    contentChanges: document.changes,
   })
   logger.LogInfo(printf('Change Document: (uri: %s)', document.uri))
+  # logger.LogInfo('Change Document Changes: ' .. document.changes->string())
 enddef
 
 # Notify LSP server when a file/buffer is closed
