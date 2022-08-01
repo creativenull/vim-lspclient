@@ -14,7 +14,7 @@ export def MergeLspClientConfig(partialLspClientConfig: dict<any>): dict<any>
   const defaults = {
     initOptions: null_dict,
     capabilities: null_dict,
-    settings: null_dict,
+    config: null_dict,
     markers: null_list,
   }
 
