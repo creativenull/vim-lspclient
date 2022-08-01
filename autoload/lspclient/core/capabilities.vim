@@ -19,6 +19,10 @@ export def Make(partialCapabilities = null_dict): dict<any>
         willSaveWaitUntil: true,
         didSave: true,
       },
+      declaration: {
+        dynamicRegistration: true,
+        linkSupport: true,
+      },
       publishDiagnostics: {
         relatedInformation: true,
         tagSupport: { valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated] },

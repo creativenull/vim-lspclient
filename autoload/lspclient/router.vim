@@ -3,6 +3,7 @@ vim9script
 import './logger.vim'
 import './core/protocol.vim'
 import './features/language/publish_diagnostics.vim'
+import './features/language/goto_declaration.vim'
 import './features/workspace/configuration.vim'
 import './features/window/message.vim'
 
@@ -23,6 +24,10 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
     for registration in registrations->copy()
       if registration.method == 'workspace/didChangeConfiguration'
         configuration.NotifyDidChangeConfiguration(ch, lspClientConfig)
+      endif
+
+      if registration.method == 'textDocument/declaration'
+        goto_declaration.HandleGotoDeclarationRegistration(ch, registration, lspClientConfig)
       endif
     endfor
   endif
