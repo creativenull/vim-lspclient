@@ -18,6 +18,10 @@ command! LSPClientCheckHealth call checkhealth.Info()
 command! LSPClientLog call logger.OpenLogFilepath()
 command! LSPClientLogClear call logger.ClearLogContents()
 command! LSPClientInfo call lspclient.Info()
+
+command! LSPClientGotoDefinition call lspclient.GotoDefinition()
+command! LSPClientGotoDeclaration call lspclient.GotoDeclaration()
+
 command! LSPClientDiagnostics echom 'WIP!'
 
 highlight LspClientPopupBorder guifg=#eeeeee guibg=NONE

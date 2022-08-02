@@ -6,6 +6,8 @@ import './lspclient/fs.vim'
 import './lspclient/logger.vim'
 import './lspclient/router.vim'
 import './lspclient/config.vim'
+import './lspclient/features/language/goto_declaration.vim'
+import './lspclient/features/language/goto_definition.vim'
 
 # Events
 const openBufEvents = ['BufRead']
@@ -64,25 +66,79 @@ def RemoveDocument(id: string, buf: number): dict<any>
   return null_dict
 enddef
 
+def IsAttachedToBuffers(id: string, buf: number): bool
+  const results = filter(GetDocuments(id)->copy(), (i, val) => val.bufnr == buf)
+  return !results->empty()
+enddef
+
+# Language Features
+# ---
+
+# Make a callback for every client attached to a buffer
+def RequestForEachClient(Callback: func): void
+  const buf = bufnr('%')
+  const registeredClients = lspClients->keys()
+
+  if registeredClients->empty()
+    return
+  endif
+
+  for clientId in registeredClients
+    if IsAttachedToBuffers(clientId, buf)
+      Callback(GetChannel(clientId), buf)
+    endif
+  endfor
+enddef
+
+export def GotoDeclaration(): void
+  RequestForEachClient((ch: channel, buf: number) => {
+    const [_, line, col, _, _] = getcurpos()
+    const doc = {
+      uri: fs.ProjectFileToUri(buf->bufname()),
+      position: {
+        line: line - 1,
+        character: col - 1,
+      },
+    }
+
+    goto_declaration.RequestGotoDeclaration(ch, doc)
+  })
+enddef
+
+export def GotoDefinition(): void
+  RequestForEachClient((ch: channel, buf: number) => {
+    const [_, line, col, _, _] = getcurpos()
+    const doc = {
+      uri: fs.ProjectFileToUri(buf->bufname()),
+      position: {
+        line: line - 1,
+        character: col - 1,
+      },
+    }
+
+    goto_definition.RequestGotoDefinition(ch, doc)
+  })
+enddef
+
 # Buffer/Document sync
 # ---
 
 export def DocumentWillSave(id: string, buf: number): void
   if buf->getbufvar('&modified')
-    document.NotifyWillSave(GetChannel(id), { uri: fs.FileToUri(buf->bufname()) })
+    document.NotifyWillSave(GetChannel(id), { uri: fs.ProjectFileToUri(buf->bufname()) })
   endif
 enddef
 
 export def DocumentDidSave(id: string, buf: number): void
   if buf->getbufvar('&modified')
-    document.NotifyDidSave(GetChannel(id), { uri: fs.FileToUri(buf->bufname()) })
+    document.NotifyDidSave(GetChannel(id), { uri: fs.ProjectFileToUri(buf->bufname()) })
   endif
 enddef
 
 export def DocumentDidChange(id: string, buf: number, changes: list<any>): void
   if buf->getbufvar('&modified')
     document.NotifyDidChange(GetChannel(id), {
-      uri: fs.FileToUri(buf->bufname()),
+      uri: fs.ProjectFileToUri(buf->bufname()),
       version: buf->getbufvar('changedtick'),
       changes: changes,
     })
@@ -96,7 +152,7 @@ export def DocumentDidOpen(id: string): void
   const isFileType = GetConfig(id).filetypes->index(ft) != -1
   if isFileType
     document.NotifyDidOpen(GetChannel(id), {
-      uri: fs.FileToUri(buf->bufname()),
+      uri: fs.ProjectFileToUri(buf->bufname()),
       filetype: ft,
       version: buf->getbufvar('changedtick'),
       contents: fs.GetBufferContents(buf),
@@ -162,13 +218,13 @@ export def DocumentDidClose(id: string, buf: number): void
   listener_remove(doc.listenerRef)
   autocmd_delete([
     {
-      group: lspClients[id].group,
+      group: GetEventGroup(id),
       event: closeBufEvents,
       bufnr: buf,
     },
   ])
   
-  document.NotifyDidClose(GetChannel(id), { uri: fs.FileToUri(buf->bufname()) })
+  document.NotifyDidClose(GetChannel(id), { uri: fs.ProjectFileToUri(buf->bufname()) })
 enddef
 
 # LSP Server functions

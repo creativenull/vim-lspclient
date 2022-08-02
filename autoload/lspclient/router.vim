@@ -2,8 +2,9 @@ vim9script
 
 import './logger.vim'
 import './core/protocol.vim'
-import './features/language/publish_diagnostics.vim'
 import './features/language/goto_declaration.vim'
+import './features/language/goto_definition.vim'
+import './features/language/publish_diagnostics.vim'
 import './features/workspace/configuration.vim'
 import './features/window/message.vim'
 
@@ -28,6 +29,10 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
 
       if registration.method == 'textDocument/declaration'
         goto_declaration.HandleGotoDeclarationRegistration(ch, registration, lspClientConfig)
+      endif
+
+      if registration.method == 'textDocument/definition'
+        goto_definition.HandleGotoDefinitionRegistration(ch, registration, lspClientConfig)
       endif
     endfor
   endif

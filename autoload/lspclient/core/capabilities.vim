@@ -23,6 +23,10 @@ export def Make(partialCapabilities = null_dict): dict<any>
         dynamicRegistration: true,
         linkSupport: true,
       },
+      definition: {
+        dynamicRegistration: true,
+        linkSupport: true,
+      },
       publishDiagnostics: {
         relatedInformation: true,
         tagSupport: { valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated] },
