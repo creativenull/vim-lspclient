@@ -284,11 +284,12 @@ export def LspStartServer(id: string): void
   enddef
 
   def OnStderr(ch: channel, data: any): void
+    logger.PrintError('STDERR : ' .. data->string())
     logger.LogError('STDERR : ' .. data->string())
   enddef
 
   def OnExit(ch: channel, data: any): void
-    logger.LogInfo('Channel Exiting')
+    logger.PrintInfo('Channel Exiting')
   enddef
 
   const jobOpts = {
