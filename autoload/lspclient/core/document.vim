@@ -32,9 +32,7 @@ enddef
 # Notify LSP server on file/buffer change
 export def NotifyDidChange(ch: channel, document: dict<any>): void
   protocol.NotifyAsync(ch, 'textDocument/didChange', {
-    textDocument: {
-      version: document.version,
-    },
+    textDocument: { version: document.version },
     contentChanges: document.changes,
   })
   logger.LogInfo(printf('Change Document: (uri: %s)', document.uri))
@@ -44,9 +42,7 @@ enddef
 # Notify LSP server when a file/buffer is closed
 export def NotifyDidClose(ch: channel, document: dict<any>): void
   protocol.NotifyAsync(ch, 'textDocument/didClose', {
-    textDocument: {
-      uri: document.uri,
-    },
+    textDocument: { uri: document.uri },
   })
   logger.LogInfo(printf('Close Document: (uri: %s)', document.uri))
 enddef
@@ -54,9 +50,7 @@ enddef
 # Let LSP server know when the document is being saved to the filesystem
 export def NotifyWillSave(ch: channel, document: dict<any>): void
   protocol.NotifyAsync(ch, 'textDocument/willSave', {
-    textDocument: {
-      uri: document.uri,
-    },
+    textDocument: { uri: document.uri },
     reason: 1, # Manually
   })
   logger.LogInfo(printf('WillSave Document: (uri: %s)', document.uri))
@@ -65,9 +59,7 @@ enddef
 # Let LSP server know when the document has been saved to the filesystem
 export def NotifyDidSave(ch: channel, document: dict<any>): void
   protocol.NotifyAsync(ch, 'textDocument/didSave', {
-    textDocument: {
-      uri: document.uri,
-    },
+    textDocument: { uri: document.uri },
   })
   logger.LogInfo(printf('DidSave Document: (uri: %s)', document.uri))
 enddef
