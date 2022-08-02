@@ -6,22 +6,19 @@ import '../../core/protocol.vim'
 
 var isDynamicallyEnabled = false
 
-def OnGotoDeclarationReponse(): void
-
+def OnGotoDeclarationReponse(ch: channel, response: any): void
+  logger.LogInfo('Response textDocument/declaration: ' .. response->string())
 enddef
 
 export def RequestGotoDeclaration(ch: channel, document: dict<any>): void
   if isDynamicallyEnabled
     const params = {
       textDocument: { uri: document.uri },
-      position: {
-        line: document.cursor.line - 1,
-        character: document.cursor.col - 1,
-      },
-      workDoneToken: '',
-      partialResultToken: '',
+      position: document.position,
+      # workDoneToken: '',
+      # partialResultToken: '',
     }
-    # protocol.RequestAsync(ch, 'textDocument/declaration', params, OnGotoDeclarationReponse)
+    protocol.RequestAsync(ch, 'textDocument/declaration', params, OnGotoDeclarationReponse)
     logger.LogInfo('Request textDocument/declaration: ' .. params->string())
   endif
 enddef
