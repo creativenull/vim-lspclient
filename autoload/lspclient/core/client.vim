@@ -34,8 +34,8 @@ export def Initialize(
 
   protocol.RequestAsync(ch, 'initialize', params, opts.callback)
 
-  logger.LogInfo('LSP Issue Initialize with project root URI: ' .. params.rootUri)
-  logger.LogInfo('LSP Issue Initialize with workspace folders: ' .. params.workspaceFolders->string())
+  logger.LogInfo('LSP Issue Initialize with rootUri: ' .. params.rootUri)
+  logger.LogInfo('LSP Issue Initialize with workspaceFolders: ' .. params.workspaceFolders->string())
   logger.LogInfo('LSP Issue Initialize with capabilities: ' .. clientCapabilities->string())
   logger.LogInfo('LSP Issue Initialize with initializationOptions: ' .. initializationOptions->string())
 enddef
