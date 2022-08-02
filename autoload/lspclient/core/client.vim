@@ -20,8 +20,7 @@ export def Initialize(
 ): void
   const clientCapabilities = capabilities.Make(opts.lspClientConfig.capabilities)
   const initializationOptions = opts.lspClientConfig.initOptions
-
-  protocol.RequestAsync(ch, 'initialize', {
+  const params = {
     processId: getpid(),
     locale: locale,
     clientInfo: clientInfo,
@@ -29,8 +28,11 @@ export def Initialize(
     trace: 'verbose',
     initializationOptions: initializationOptions,
     capabilities: clientCapabilities,
-  }, opts.callback)
+  }
 
+  protocol.RequestAsync(ch, 'initialize', params, opts.callback)
+
+  logger.LogInfo('LSP Issue Initialize with project URI: ' .. params.rootUri)
   logger.LogInfo('LSP Issue Initialize with capabilities: ' .. clientCapabilities->string())
   logger.LogInfo('LSP Issue Initialize with initializationOptions: ' .. initializationOptions->string())
 enddef
