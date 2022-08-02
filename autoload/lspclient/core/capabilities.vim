@@ -10,10 +10,7 @@ export def Make(partialCapabilities = null_dict): dict<any>
     workspace: {
       didChangeConfiguration: { dynamicRegistration: true },
       configuration: true,
-      workspaceFolders: {
-        supported: true,
-        changeNotifications: false,
-      },
+      workspaceFolders: true,
     },
     textDocument: {
       synchronization: {
