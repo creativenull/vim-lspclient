@@ -10,7 +10,7 @@ import './lspclient/features/language/goto_declaration.vim'
 import './lspclient/features/language/goto_definition.vim'
 
 # Events
-const openBufEvents = ['BufRead']
+const openBufEvents = ['BufReadPost']
 const closeBufEvents = ['BufDelete']
 const willSaveBufEvents = ['BufWritePre']
 const didSaveBufEvents = ['BufWrite']
@@ -91,8 +91,10 @@ def RequestForEachClient(Callback: func): void
 enddef
 
 export def GotoDeclaration(): void
-  RequestForEachClient((ch: channel, buf: number) => {
-    const [_, line, col, _, _] = getcurpos()
+  def OnRequest(ch: channel, buf: number): void
+    const curpos = getcurpos()
+    const line = curpos[1]
+    const col = curpos[2]
     const doc = {
       uri: fs.ProjectFileToUri(buf->bufname()),
       position: {
@@ -102,12 +104,16 @@ export def GotoDeclaration(): void
     }
 
     goto_declaration.RequestGotoDeclaration(ch, doc)
-  })
+  enddef
+
+  RequestForEachClient(OnRequest)
 enddef
 
 export def GotoDefinition(): void
-  RequestForEachClient((ch: channel, buf: number) => {
-    const [_, line, col, _, _] = getcurpos()
+  def OnRequest(ch: channel, buf: number): void
+    const curpos = getcurpos()
+    const line = curpos[1]
+    const col = curpos[2]
     const doc = {
       uri: fs.ProjectFileToUri(buf->bufname()),
       position: {
@@ -117,7 +123,9 @@ export def GotoDefinition(): void
     }
 
     goto_definition.RequestGotoDefinition(ch, doc)
-  })
+  enddef
+
+  RequestForEachClient(OnRequest)
 enddef
 
 # Buffer/Document sync
@@ -163,19 +171,19 @@ export def DocumentDidOpen(id: string): void
       const endChar = start->getline()->len() - 1
 
       var contentChanges = [
-        {
-          range: {
-            start: {
-              line: start - 1,
-              character: 0,
-            },
-            end: {
-              line: start - 1,
-              character: endChar == -1 ? 0 : endChar,
-            },
-          },
-          text: getline(start),
-        },
+        # {
+        #   range: {
+        #     start: {
+        #       line: start - 1,
+        #       character: 0,
+        #     },
+        #     end: {
+        #       line: start - 1,
+        #       character: endChar == -1 ? 0 : endChar,
+        #     },
+        #   },
+        #   text: getline(start),
+        # },
         { text: fs.GetBufferContents(bufnr) },
       ]
 
