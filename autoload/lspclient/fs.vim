@@ -25,13 +25,14 @@ export def GetProjectRoot(extendPath: string = ''): string
   return getcwd()
 enddef
 
+# Get the project full path as URI
+export def GetProjectRootUri(): string
+  return FileToUri(GetProjectRoot())
+enddef
+
 # Convert file residing in the project/workspace folder to a full path URI
 export def ProjectFileToUri(relativeFilepath: string): string
   return FileToUri(GetProjectRoot(relativeFilepath))
-enddef
-
-export def GetProjectRootUri(): string
-  return FileToUri(GetProjectRoot())
 enddef
 
 export def GetFileContents(filepath: string): string

@@ -8,9 +8,12 @@ const PositionEncodingKind = types.PositionEncodingKind
 export def Make(partialCapabilities = null_dict): dict<any>
   const defaults = {
     workspace: {
-      applyEdit: true,
       didChangeConfiguration: { dynamicRegistration: true },
       configuration: true,
+      workspaceFolders: {
+        supported: true,
+        changeNotifications: false,
+      },
     },
     textDocument: {
       synchronization: {

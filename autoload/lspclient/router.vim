@@ -6,11 +6,16 @@ import './features/language/goto_declaration.vim'
 import './features/language/goto_definition.vim'
 import './features/language/publish_diagnostics.vim'
 import './features/workspace/configuration.vim'
+import './features/workspace/workspace_folders.vim'
 import './features/window/message.vim'
 
 export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
   if request.method == 'workspace/configuration'
     configuration.HandleConfigurationRequest(ch, request, lspClientConfig)
+  endif
+
+  if request.method == 'workspace/workspaceFolders'
+    workspace_folders.HandleWorkspaceFoldersRequest(ch, request)
   endif
 
   if request.method == 'textDocument/publishDiagnostics'
