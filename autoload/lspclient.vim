@@ -11,6 +11,7 @@ import './lspclient/features/language/goto_definition.vim'
 
 # Events
 const openBufEvents = ['BufReadPost']
+const changeBufEvents = ['TextChanged']
 const closeBufEvents = ['BufDelete']
 const willSaveBufEvents = ['BufWritePre']
 const didSaveBufEvents = ['BufWrite']
@@ -58,6 +59,7 @@ enddef
 
 def RemoveDocument(id: string, buf: number): dict<any>
   const result = filter(copy(GetDocuments(id)), (i, val) => val.bufnr == buf)
+  GetDocuments(id)->filter((i, val) => val.bufnr != buf)
 
   if !result->empty()
     return result[0]
@@ -143,12 +145,14 @@ export def DocumentDidSave(id: string, buf: number): void
   endif
 enddef
 
-export def DocumentDidChange(id: string, buf: number, changes: list<any>): void
+export def DocumentDidChange(id: string, buf: number): void
   if buf->getbufvar('&modified')
+    const contentChanges = [{ text: fs.GetBufferContents(buf) }]
+
     document.NotifyDidChange(GetChannel(id), {
       uri: fs.ProjectFileToUri(buf->bufname()),
       version: buf->getbufvar('changedtick'),
-      changes: changes,
+      changes: contentChanges,
     })
   endif
 enddef
@@ -166,37 +170,17 @@ export def DocumentDidOpen(id: string): void
       contents: fs.GetBufferContents(buf),
     })
 
-    # Subscribe to buffer changes
-    def OnChange(bufnr: number, start: number, end: number, added: number, changes: list<any>)
-      const endChar = start->getline()->len() - 1
-
-      var contentChanges = [
-        # {
-        #   range: {
-        #     start: {
-        #       line: start - 1,
-        #       character: 0,
-        #     },
-        #     end: {
-        #       line: start - 1,
-        #       character: endChar == -1 ? 0 : endChar,
-        #     },
-        #   },
-        #   text: getline(start),
-        # },
-        { text: fs.GetBufferContents(bufnr) },
-      ]
-
-      DocumentDidChange(id, bufnr, contentChanges)
-    enddef
-
-    const ref = buf->listener_add(OnChange)
-
     # Track this document lifecycle, include any other refs
-    TrackDocument(id, { bufnr: buf, listenerRef: ref })
+    TrackDocument(id, { bufnr: buf })
 
     # Buffer events to be sent to LSP server, until closed
     autocmd_add([
+      {
+        group: GetEventGroup(id),
+        event: changeBufEvents,
+        bufnr: buf,
+        cmd: printf('call lspclient#DocumentDidChange("%s", %d)', id, buf)
+      },
       {
         group: GetEventGroup(id),
         event: closeBufEvents,
@@ -223,8 +207,12 @@ export def DocumentDidClose(id: string, buf: number): void
   const doc = RemoveDocument(id, buf)
 
   # Unsubscribe from changes and events
-  listener_remove(doc.listenerRef)
   autocmd_delete([
+    {
+      group: GetEventGroup(id),
+      event: changeBufEvents,
+      bufnr: buf,
+    },
     {
       group: GetEventGroup(id),
       event: closeBufEvents,
@@ -278,9 +266,9 @@ export def LspStartServer(id: string): void
     ])
   enddef
 
-  def OnStdout(ch: channel, request: dict<any>): void
-    logger.LogInfo('STDOUT : ' .. request->string())
-    router.HandleServerRequest(ch, request, GetConfig(id))
+  def OnStdout(ch: channel, data: any): void
+    logger.LogInfo('STDOUT : ' .. data->string())
+    router.HandleServerRequest(ch, data, GetConfig(id))
   enddef
 
   def OnStderr(ch: channel, data: any): void
@@ -288,8 +276,8 @@ export def LspStartServer(id: string): void
     logger.LogError('STDERR : ' .. data->string())
   enddef
 
-  def OnExit(ch: channel, data: any): void
-    logger.PrintInfo('Channel Exiting')
+  def OnExit(ch: channel): void
+    logger.PrintInfo('Job Exiting')
   enddef
 
   const jobOpts = {
