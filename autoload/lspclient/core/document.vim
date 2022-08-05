@@ -32,7 +32,10 @@ enddef
 # Notify LSP server on file/buffer change
 export def NotifyDidChange(ch: channel, document: dict<any>): void
   protocol.NotifyAsync(ch, 'textDocument/didChange', {
-    textDocument: { version: document.version },
+    textDocument: {
+      uri: document.uri,
+      version: document.version,
+    },
     contentChanges: document.changes,
   })
   logger.LogInfo(printf('Change Document: (uri: %s)', document.uri))
