@@ -158,7 +158,10 @@ export def DocumentDidChange(id: string, buf: number): void
   if buf->getbufvar('&modified')
     # TODO: Figure out a way to be able to create diffs instead of
     #       sending the entire buffer.
-    #       Possible solution: implement Myers's O(ND) algorithm
+    #
+    #       Possible solutions: 
+    #         + Implement Myers's O(ND) algorithm (caveat: need time to learn it)
+    #         + Use listener_add() to provided changes (caveat: only works on insert mode, might need to debounce)
     const contentChanges = [{ text: fs.GetBufferContents(buf) }]
 
     document.NotifyDidChange(GetChannel(id), {
