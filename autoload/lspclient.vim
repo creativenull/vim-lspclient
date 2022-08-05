@@ -27,10 +27,6 @@ const didSaveBufEvents = ['BufWrite']
 # }
 var lspClients = {}
 
-def HasStarted(ch: channel): bool
-  return ch->ch_status() == 'open'
-enddef
-
 # LspClient property access
 # ---
 
@@ -80,6 +76,10 @@ enddef
 def IsAttachedToBuffers(id: string, buf: number): bool
   const results = filter(GetDocuments(id)->copy(), (i, val) => val.bufnr == buf)
   return !results->empty()
+enddef
+
+def IsChannelConnected(ch: channel): bool
+  return ch->ch_status() == 'open'
 enddef
 
 # Language Features
@@ -242,7 +242,7 @@ enddef
 # ---
 
 export def LspStartServer(id: string): void
-  if HasStarted(GetChannel(id))
+  if IsChannelConnected(GetChannel(id))
     return
   endif
 
@@ -327,7 +327,7 @@ export def LspStartServer(id: string): void
 enddef
 
 export def LspStopServer(id: string): void
-  if !HasStarted(GetChannel(id))
+  if !IsChannelConnected(GetChannel(id))
     return
   endif
 
