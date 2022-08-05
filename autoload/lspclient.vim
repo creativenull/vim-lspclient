@@ -16,6 +16,15 @@ const closeBufEvents = ['BufDelete']
 const willSaveBufEvents = ['BufWritePre']
 const didSaveBufEvents = ['BufWrite']
 
+# interface LspClient {
+#   id: number
+#   group: string
+#   config: dict<any>
+#   job: job
+#   channel: channle
+#   documents: list<any>
+#   serverCapabilities: dict<any>
+# }
 var lspClients = {}
 
 def HasStarted(ch: channel): bool
@@ -250,6 +259,10 @@ export def LspStartServer(id: string): void
       return
     endif
 
+    # Store server capabilities
+    lspClients[id].serverCapabilities = response.result.capabilities
+    logger.LogInfo('SERVER CAPABILITIES: ' .. response->string())
+
     client.Initialized(ch)
 
     # Open the current document
@@ -337,6 +350,7 @@ export def Create(partialLspClientConfig: dict<any>): void
     job: null_job,
     channel: null_channel,
     documents: [],
+    serverCapabilities: null_dict,
   }
 
   # Add to a 'global' state

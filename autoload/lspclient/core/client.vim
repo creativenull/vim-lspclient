@@ -34,10 +34,10 @@ export def Initialize(
 
   protocol.RequestAsync(ch, 'initialize', params, opts.callback)
 
-  logger.LogInfo('LSP Issue Initialize with rootUri: ' .. params.rootUri)
-  logger.LogInfo('LSP Issue Initialize with workspaceFolders: ' .. params.workspaceFolders->string())
-  logger.LogInfo('LSP Issue Initialize with capabilities: ' .. clientCapabilities->string())
-  logger.LogInfo('LSP Issue Initialize with initializationOptions: ' .. initializationOptions->string())
+  logger.LogInfo('INITIALIZE rootUri: ' .. params.rootUri)
+  logger.LogInfo('INITIALIZE workspaceFolders: ' .. params.workspaceFolders->string())
+  logger.LogInfo('INITIALIZE clientCapabilities: ' .. clientCapabilities->string())
+  logger.LogInfo('INITIALIZE initializationOptions: ' .. initializationOptions->string())
 enddef
 
 # Notify the server when client has initialized

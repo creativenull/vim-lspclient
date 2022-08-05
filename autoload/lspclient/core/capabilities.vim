@@ -14,7 +14,7 @@ export def Make(partialCapabilities = null_dict): dict<any>
     },
     textDocument: {
       synchronization: {
-        dynamicRegistration: false,
+        dynamicRegistration: true,
         willSave: true,
         willSaveWaitUntil: true,
         didSave: true,
@@ -34,10 +34,6 @@ export def Make(partialCapabilities = null_dict): dict<any>
         codeDescriptionSupport: true,
         dataSupport: true,
       },
-      diagnostic: {
-        dynamicRegistration: true,
-        relatedDocumentSupport: true,
-      },
     },
     window: {
       workDoneProgress: true,
@@ -45,7 +41,6 @@ export def Make(partialCapabilities = null_dict): dict<any>
         messageActionItem: { additionalPropertiesSupport: true },
       },
     },
-    general: { positionEncodings: [PositionEncodingKind.UTF8, PositionEncodingKind.UTF16] },
   }
 
   if partialCapabilities->empty()
