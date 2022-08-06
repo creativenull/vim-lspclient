@@ -125,22 +125,7 @@ export def GotoDeclaration(): void
 enddef
 
 export def GotoDefinition(): void
-  def OnRequest(ch: channel, buf: number): void
-    const curpos = getcurpos()
-    const line = curpos[1]
-    const col = curpos[2]
-    const doc = {
-      uri: fs.ProjectFileToUri(buf->bufname()),
-      position: {
-        line: line - 1,
-        character: col - 1,
-      },
-    }
-
-    goto_definition.RequestGotoDefinition(ch, doc)
-  enddef
-
-  RequestForEachClient(OnRequest)
+  RequestForEachClient(goto_definition.Request)
 enddef
 
 # Buffer/Document sync
