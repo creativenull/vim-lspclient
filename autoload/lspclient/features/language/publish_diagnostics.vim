@@ -3,9 +3,10 @@ vim9script
 import '../../logger.vim'
 import '../../fs.vim'
 import '../../core/types.vim'
-import '../../vim/popup.vim'
+import '../../vim/sign.vim'
 
 const DiagnosticSeverity = types.DiagnosticSeverity
+const SignSeverity = sign.SeverityType
 
 def MakeLocListText(diagnostic: dict<any>): string
   return printf('%s: %s', diagnostic->get('source', ''), diagnostic.message)
@@ -20,7 +21,7 @@ export def HandlePublishDiagnosticsNotification(request: any, lspClientConfig: d
   # Set location-list
   if diagnostics->empty()
     setloclist(0, [], 'r')
-    # logger.PrintInfo('publishDiagnostics: []')
+    sign.UnplaceBuffer(buf)
 
     return
   endif
@@ -35,8 +36,16 @@ export def HandlePublishDiagnosticsNotification(request: any, lspClientConfig: d
     type: DiagnosticSeverity[diagnostic.severity],
     text: MakeLocListText(diagnostic),
   }))
-
   setloclist(0, loclist, 'r')
-  popup.Notify('Error', printf('Found %s problems', loclist->len()))
-  # logger.PrintInfo('publishDiagnostics: ' .. loclist->string())
+
+  # Generate signs from diagnostics with a clean slate
+  sign.UnplaceBuffer(buf)
+  const signs = diagnostics->mapnew((i, diagnostic) => ({
+    buf: buf,
+    lnum: diagnostic.range.start.line + 1,
+    level: SignSeverity[DiagnosticSeverity[diagnostic.severity]],
+  }))
+  sign.PlaceList(signs)
+
+  # Generate Text Props
 enddef

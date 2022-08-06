@@ -10,6 +10,7 @@ if exists('g:loaded_lspclient')
 endif
 
 import autoload 'lspclient/vim/checkhealth.vim'
+import autoload 'lspclient/vim/sign.vim'
 import autoload 'lspclient/logger.vim'
 import autoload 'lspclient.vim'
 
@@ -24,10 +25,14 @@ command! LSPClientGotoDeclaration call lspclient.GotoDeclaration()
 
 command! LSPClientDiagnostics echom 'WIP!'
 
-highlight LspClientPopupBorder guifg=#eeeeee guibg=NONE
-highlight LspClientPopupInfo guifg=#eeeeee guibg=NONE
-highlight default link LspClientPopupError ErrorMsg
-highlight default link LspClientPopupWarning WarningMsg
-highlight default link LspClientTextProp NonText
+# Popup Highlights
+highlight LSPClientPopupBorder guifg=#eeeeee guibg=NONE
+highlight LSPClientPopupInfo guifg=#eeeeee guibg=NONE
+highlight default link LSPClientPopupError ErrorMsg
+highlight default link LSPClientPopupWarning WarningMsg
+
+# Sign Highlights and Definitions
+sign.DefineHighlights()
+sign.DefineSigns()
 
 g:loaded_lspclient = true
