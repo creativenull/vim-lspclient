@@ -33,7 +33,7 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
       endif
 
       if registration.method == 'textDocument/declaration'
-        goto_declaration.HandleGotoDeclarationRegistration(ch, registration, lspClientConfig)
+        goto_declaration.Register(ch, registration, lspClientConfig)
       endif
 
       if registration.method == 'textDocument/definition'

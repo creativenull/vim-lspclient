@@ -4,25 +4,34 @@ import '../../logger.vim'
 import '../../fs.vim'
 import '../../core/protocol.vim'
 
-var isDynamicallyEnabled = false
-
-def OnGotoDeclarationReponse(ch: channel, response: any): void
+def OnResponse(ch: channel, response: any): void
   logger.LogInfo('Response textDocument/declaration: ' .. response->string())
 enddef
 
-export def RequestGotoDeclaration(ch: channel, document: dict<any>): void
-  if isDynamicallyEnabled
-    const params = {
-      textDocument: { uri: document.uri },
-      position: document.position,
-      # workDoneToken: '',
-      # partialResultToken: '',
-    }
-    protocol.RequestAsync(ch, 'textDocument/declaration', params, OnGotoDeclarationReponse)
-    logger.LogInfo('Request textDocument/declaration: ' .. params->string())
-  endif
+def MakeRequest(ch: channel, params: dict<any>): void
+  protocol.RequestAsync(ch, 'textDocument/declaration', params, OnResponse)
+  logger.LogInfo('Request textDocument/declaration: ' .. params->string())
 enddef
 
-export def HandleGotoDeclarationRegistration(ch: channel, registrationOptions: any, lspClientConfig: dict<any>): void
+export def Request(ch: channel, buf: number): void
+  const curpos = getcurpos()
+  const line = curpos[1]
+  const col = curpos[2]
+  const params = {
+    textDocument: {
+      uri: fs.ProjectFileToUri(buf->bufname()),
+    },
+    position: {
+      line: line - 1,
+      character: col - 1,
+    },
+    # workDoneToken: '',
+    # partialResultToken: '',
+  }
+
+  MakeRequest(ch, params)
+enddef
+
+export def Register(ch: channel, registrationOptions: any, lspClientConfig: dict<any>): void
   logger.LogInfo('Received Dynamic Registration: textDocument/declaration: ' .. registrationOptions->string())
 enddef
