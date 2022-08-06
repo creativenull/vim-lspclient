@@ -58,6 +58,10 @@ def GetDocuments(id: string): list<any>
   return lspClients[id].documents
 enddef
 
+def GetServerCapabilities(id: string): dict<any>
+  return lspClients[id].serverCapabilities
+enddef
+
 def TrackDocument(id: string, newValue: dict<any>): void
   lspClients[id].documents->add(newValue)
 enddef
@@ -174,48 +178,62 @@ enddef
 
 export def DocumentDidOpen(id: string): void
   const buf = bufnr('%')
-
   const ft = buf->getbufvar('&filetype')
   const isFileType = GetConfig(id).filetypes->index(ft) != -1
-  if isFileType
-    document.NotifyDidOpen(GetChannel(id), {
-      uri: fs.ProjectFileToUri(buf->bufname()),
-      filetype: ft,
-      version: buf->getbufvar('changedtick'),
-      contents: fs.GetBufferContents(buf),
-    })
 
-    # Track this document lifecycle, include any other refs
-    TrackDocument(id, { bufnr: buf })
+  if !isFileType
+    return
+  endif
 
-    # Buffer events to be sent to LSP server, until closed
-    autocmd_add([
-      {
-        group: GetEventGroup(id),
-        event: changeBufEvents,
-        bufnr: buf,
-        cmd: printf('call lspclient#DocumentDidChange("%s", %d)', id, buf)
-      },
-      {
-        group: GetEventGroup(id),
-        event: closeBufEvents,
-        bufnr: buf,
-        cmd: printf('call lspclient#DocumentDidClose("%s", %d)', id, buf)
-      },
-      {
+  document.NotifyDidOpen(GetChannel(id), {
+    uri: fs.ProjectFileToUri(buf->bufname()),
+    filetype: ft,
+    version: buf->getbufvar('changedtick'),
+    contents: fs.GetBufferContents(buf),
+  })
+
+  # Track this document lifecycle, include any other refs
+  TrackDocument(id, { bufnr: buf })
+
+  # Subscribe to buffer event until closed
+  const textDocumentSync = GetServerCapabilities(id)->get('textDocumentSync', {})
+  var documentEvents = [
+    {
+      group: GetEventGroup(id),
+      event: changeBufEvents,
+      bufnr: buf,
+      cmd: printf('call lspclient#DocumentDidChange("%s", %d)', id, buf)
+    },
+    {
+      group: GetEventGroup(id),
+      event: closeBufEvents,
+      bufnr: buf,
+      cmd: printf('call lspclient#DocumentDidClose("%s", %d)', id, buf)
+    },
+  ]
+
+  # Enable extra document features, if available by the server capabilities
+  if textDocumentSync->type() == v:t_dict
+    if !textDocumentSync->empty() && textDocumentSync->get('willSave', false)
+      documentEvents->add({
         group: GetEventGroup(id),
         event: willSaveBufEvents,
         bufnr: buf,
         cmd: printf('call lspclient#DocumentWillSave("%s", %d)', id, buf)
-      },
-      {
+      })
+    endif
+
+    if !textDocumentSync->empty() && textDocumentSync->get('save', false)
+      documentEvents->add({
         group: GetEventGroup(id),
         event: didSaveBufEvents,
         bufnr: buf,
         cmd: printf('call lspclient#DocumentDidSave("%s", %d)', id, buf)
-      },
-    ])
+      })
+    endif
   endif
+
+  autocmd_add(documentEvents)
 enddef
 
 export def DocumentDidClose(id: string, buf: number): void
