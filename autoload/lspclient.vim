@@ -67,7 +67,7 @@ def TrackDocument(id: string, newValue: dict<any>): void
 enddef
 
 def RemoveDocument(id: string, buf: number): dict<any>
-  const result = filter(copy(GetDocuments(id)), (i, val) => val.bufnr == buf)
+  const result = GetDocuments(id)->copy()->filter((i, val) => val.bufnr == buf)
   GetDocuments(id)->filter((i, val) => val.bufnr != buf)
 
   if !result->empty()
@@ -237,7 +237,7 @@ export def DocumentDidOpen(id: string): void
 enddef
 
 export def DocumentDidClose(id: string, buf: number): void
-  const doc = RemoveDocument(id, buf)
+  RemoveDocument(id, buf)
 
   # Unsubscribe from changes and events
   autocmd_delete([
