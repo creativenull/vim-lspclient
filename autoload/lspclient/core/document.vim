@@ -61,8 +61,15 @@ enddef
 
 # Let LSP server know when the document has been saved to the filesystem
 export def NotifyDidSave(ch: channel, document: dict<any>): void
-  protocol.NotifyAsync(ch, 'textDocument/didSave', {
+  var params = {
     textDocument: { uri: document.uri },
-  })
+  }
+
+  # Optionally include text provided by server capabilities
+  if document->get('text', null)
+    params.text = document.text
+  endif
+
+  protocol.NotifyAsync(ch, 'textDocument/didSave', params)
   logger.LogInfo(printf('DidSave Document: (uri: %s)', document.uri))
 enddef

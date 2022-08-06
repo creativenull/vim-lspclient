@@ -122,9 +122,12 @@ export def DocumentWillSave(id: string, buf: number): void
   endif
 enddef
 
-export def DocumentDidSave(id: string, buf: number): void
+export def DocumentDidSave(id: string, buf: number, includeText = false): void
   if buf->getbufvar('&modified')
-    document.NotifyDidSave(GetChannel(id), { uri: fs.ProjectFileToUri(buf->bufname()) })
+    document.NotifyDidSave(GetChannel(id), {
+      uri: fs.ProjectFileToUri(buf->bufname()),
+      text: includeText ? fs.GetBufferContents(buf->bufname()) : null,
+    })
   endif
 enddef
 
@@ -184,7 +187,7 @@ export def DocumentDidOpen(id: string): void
 
   # Enable extra document features, if available by the server capabilities
   if textDocumentSync->type() == v:t_dict
-    if !textDocumentSync->empty() && textDocumentSync->get('willSave', false)
+    if textDocumentSync->get('willSave', false)
       documentEvents->add({
         group: GetEventGroup(id),
         event: willSaveBufEvents,
@@ -193,7 +196,16 @@ export def DocumentDidOpen(id: string): void
       })
     endif
 
-    if !textDocumentSync->empty() && textDocumentSync->get('save', false)
+    const didSave = textDocumentSync->get('save')
+    if didSave->type() == v:t_dict && !didSave->empty() && didSave->get('includeText', false)
+      # Only include text if: it's a dict, not empty dict, and didSave.includeText is true
+      documentEvents->add({
+        group: GetEventGroup(id),
+        event: didSaveBufEvents,
+        bufnr: buf,
+        cmd: printf('call lspclient#DocumentDidSave("%s", %d, v:true)', id, buf)
+      })
+    elseif (didSave->type() == v:t_bool || didSave->type() == v:t_number) && didSave
       documentEvents->add({
         group: GetEventGroup(id),
         event: didSaveBufEvents,
