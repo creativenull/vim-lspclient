@@ -25,11 +25,12 @@ enddef
 
 export def DefineHighlights(): void
   hlset([
-    { name: 'LSPClientPopupBorder', guifg: '#eeeeee', guibg: 'NONE' },
+    { name: 'LSPClientPopupBorder', guifg: colors.Text, guibg: 'NONE' },
     { name: 'LSPClientPopupBorderError', guifg: colors.Error, guibg: 'NONE' },
     { name: 'LSPClientPopupBorderWarning', guifg: colors.Warning, guibg: 'NONE' },
     { name: 'LSPClientPopupBorderHint', guifg: colors.Hint, guibg: 'NONE' },
     { name: 'LSPClientPopupBorderInfo', guifg: colors.Info, guibg: 'NONE' },
+    { name: 'LSPClientPopup', guifg: colors.Text, guibg: 'NONE' },
     { name: 'LSPClientPopupError', guifg: colors.Error, guibg: 'NONE' },
     { name: 'LSPClientPopupWarning', guifg: colors.Warning, guibg: 'NONE' },
     { name: 'LSPClientPopupHint', guifg: colors.Hint, guibg: 'NONE' },
@@ -44,14 +45,14 @@ export def Notify(message: any, level: string): void
 
   isNotifyOpen = true
   message->popup_notification({
+    title: title,
     line: 2,
     col: winwidth(0) - 50,
     minwidth: 50,
     maxwidth: 50,
-    highlight: printf('LSPClientPopup%s', level),
+    highlight: 'LSPClientPopup',
     borderchars: borderchars,
     borderhighlight: [printf('LSPClientPopupBorder%s', level)],
-    title: title,
     time: 5000,
     callback: OnCloseNotify,
   })
@@ -68,7 +69,7 @@ export def Cursor(message: any, level: string): void
     pos: 'topleft',
     minwidth: 80,
     maxwidth: 80,
-    highlight: printf('LSPClientPopup%s', level),
+    highlight: 'LSPClientPopup',
     border: [],
     padding: [0, 1, 0, 1],
     borderchars: borderchars,
