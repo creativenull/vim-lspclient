@@ -11,6 +11,7 @@ endif
 
 import autoload 'lspclient/vim/checkhealth.vim'
 import autoload 'lspclient/vim/sign.vim'
+import autoload 'lspclient/vim/popup.vim'
 import autoload 'lspclient/logger.vim'
 import autoload 'lspclient.vim'
 
@@ -23,13 +24,11 @@ command! LSPClientInfo call lspclient.Info()
 command! LSPClientGotoDefinition call lspclient.GotoDefinition()
 command! LSPClientGotoDeclaration call lspclient.GotoDeclaration()
 
-command! LSPClientDiagnostics echom 'WIP!'
+command! LSPClientDiagnostics lopen
+command! LSPClientHoverDiagnostic call lspclient.PopupDiagnosticAtCursor()
 
 # Popup Highlights
-highlight LSPClientPopupBorder guifg=#eeeeee guibg=NONE
-highlight LSPClientPopupInfo guifg=#eeeeee guibg=NONE
-highlight default link LSPClientPopupError ErrorMsg
-highlight default link LSPClientPopupWarning WarningMsg
+popup.DefineHighlights()
 
 # Sign Highlights and Definitions
 sign.DefineHighlights()

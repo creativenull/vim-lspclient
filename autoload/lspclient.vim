@@ -8,6 +8,7 @@ import './lspclient/router.vim'
 import './lspclient/config.vim'
 import './lspclient/features/language/goto_declaration.vim'
 import './lspclient/features/language/goto_definition.vim'
+import './lspclient/vim/popup.vim'
 
 # Events
 const openBufEvents = ['BufReadPost']
@@ -111,6 +112,21 @@ enddef
 
 export def GotoDefinition(): void
   RequestForEachClient(goto_definition.Request)
+enddef
+
+export def PopupDiagnosticAtCursor(): void
+  const [_, curlnum, curcol, _, _] = getcurpos()
+  const buf = bufnr('%')
+  const loclist = getloclist(0)
+
+  if !loclist->empty()
+    for loc in loclist
+      if loc.bufnr == buf && loc.lnum == curlnum
+        const hasLines = loc.text->match("\n") != -1
+        popup.Cursor(hasLines ? loc.text->split("\n") : loc.text, popup.SeverityType[loc.type])
+      endif
+    endfor
+  endif
 enddef
 
 # Buffer/Document sync
