@@ -1,6 +1,7 @@
 vim9script
 
 import '../logger.vim'
+import './colors.vim'
 
 var placed = []
 
@@ -14,21 +15,16 @@ export const SeverityType = {
 
 # Using tailwindcss colors
 export def DefineHighlights(): void
-  # rose-600
-  highlight LSPClientSignError guifg=#e11d48 guibg=NONE
-  highlight LSPClientSignErrorLine guifg=#e11d48 guibg=NONE gui=underline
-
-  # orange-600
-  highlight LSPClientSignWarning guifg=#e11d48 guibg=NONE
-  highlight LSPClientSignWarningLine guifg=#e11d48 guibg=NONE gui=underline
-
-  # cyan-600
-  highlight LSPClientSignInfo guifg=#0891b2 guibg=NONE
-  highlight LSPClientSignInfoLine guifg=#0891b2 guibg=NONE
-
-  # violet-600
-  highlight LSPClientSignHint guifg=#7c3aed guibg=NONE
-  highlight LSPClientSignHintLine guifg=#7c3aed guibg=NONE
+  hlset([
+    { name: 'LSPClientSignError', guifg: colors.Error, gubg: 'NONE' },
+    { name: 'LSPClientSignErrorLine', guifg: colors.Error, guibg: 'NONE', gui: { underline: true } },
+    { name: 'LSPClientSignWarning', guifg: colors.Warning, gubg: 'NONE' },
+    { name: 'LSPClientSignWarningLine', guifg: colors.Warning, guibg: 'NONE', gui: { underline: true } },
+    { name: 'LSPClientSignInfo', guifg: colors.Info, gubg: 'NONE' },
+    { name: 'LSPClientSignInfoLine', guifg: colors.Info, guibg: 'NONE' },
+    { name: 'LSPClientSignHint', guifg: colors.Hint, gubg: 'NONE' },
+    { name: 'LSPClientSignHintLine', guifg: colors.Hint, guibg: 'NONE' },
+  ])
 enddef
 
 export def DefineSigns(): void
