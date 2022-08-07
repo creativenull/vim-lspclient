@@ -19,7 +19,7 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
   endif
 
   if request.method == 'textDocument/publishDiagnostics'
-    publish_diagnostics.HandlePublishDiagnosticsNotification(request, lspClientConfig)
+    publish_diagnostics.HandleRequest(request, lspClientConfig)
   endif
 
   if request.method == 'client/registerCapability'
