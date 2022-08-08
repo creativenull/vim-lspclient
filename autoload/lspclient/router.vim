@@ -1,13 +1,14 @@
 vim9script
 
-import './logger.vim'
 import './core/protocol.vim'
 import './features/language/goto_declaration.vim'
 import './features/language/goto_definition.vim'
 import './features/language/publish_diagnostics.vim'
+import './features/window/message.vim'
+import './features/window/work_done.vim'
 import './features/workspace/configuration.vim'
 import './features/workspace/workspace_folders.vim'
-import './features/window/message.vim'
+import './logger.vim'
 
 export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
   if request.method == 'workspace/configuration'
@@ -54,5 +55,9 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
 
   if request.method == 'window/logMessage'
     message.HandleLogMessage(request)
+  endif
+
+  if request.method == 'window/workDoneProgress/create'
+    work_done.Create(ch, request)
   endif
 enddef
