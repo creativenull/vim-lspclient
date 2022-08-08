@@ -8,27 +8,30 @@ import '../../vim/sign.vim'
 const DiagnosticSeverity = types.DiagnosticSeverity
 const SignSeverity = sign.SeverityType
 
-def CreateLocListTextFormat(diagnostic: dict<any>): string
-  const noSource = diagnostic->get('source', '')->empty()
-
-  if noSource
-    return diagnostic.message
-  endif
-
-  return printf('%s: %s', diagnostic.source, diagnostic.message)
+def CreateLocListTextFormat(message: string, source: string, severity: string, code: any): string
+  return printf('%s [%s %s%s]', message, source, severity, code)
 enddef
 
-def CreateLocList(diagnostics: list<any>, filename: string): list<any>
-  return diagnostics->mapnew((i, diagnostic) => ({
-    filename: filename,
-    lnum: diagnostic.range.start.line + 1,
-    col: diagnostic.range.start.character + 1,
-    end_lnum: diagnostic.range.end.line + 1,
-    end_col: diagnostic.range.end.character + 1,
-    nr: diagnostic->get('code', 0)->type() == v:t_number ? diagnostic.code : 0,
-    type: DiagnosticSeverity[diagnostic.severity],
-    text: CreateLocListTextFormat(diagnostic),
-  }))
+def CreateLocList(diagnostics: list<any>, filename: string, lspClientConfig: dict<any>): list<any>
+  def MapLocList(i: number, diagnostic: dict<any>): dict<any>
+    const code = diagnostic->get('code') != 0 ? diagnostic.code : 0
+    const source = diagnostic->get('source', lspClientConfig.name)
+    const message = diagnostic.message
+    const severity = DiagnosticSeverity[diagnostic.severity]
+
+    return {
+      filename: filename,
+      text: CreateLocListTextFormat(message, source, severity, code),
+      nr: code,
+      type: severity,
+      lnum: diagnostic.range.start.line + 1,
+      col: diagnostic.range.start.character + 1,
+      end_lnum: diagnostic.range.end.line + 1,
+      end_col: diagnostic.range.end.character + 1,
+    }
+  enddef
+
+  return diagnostics->mapnew(MapLocList)
 enddef
 
 def CreateSigns(diagnostics: list<any>, buf: number): list<any>
@@ -53,7 +56,7 @@ export def HandleRequest(request: any, lspClientConfig: dict<any>): void
     return
   endif
 
-  const loclist = CreateLocList(diagnostics, filename)
+  const loclist = CreateLocList(diagnostics, filename, lspClientConfig)
   setloclist(0, loclist, 'r')
 
   # Generate signs from diagnostics with a clean slate
