@@ -5,12 +5,12 @@ import '../../fs.vim'
 import '../../core/protocol.vim'
 
 def OnResponse(ch: channel, response: any): void
-  logger.LogInfo('Response textDocument/definition: ' .. response->string())
+  logger.LogInfo('Response `textDocument/definition`: ' .. response->string())
 enddef
 
 def MakeRequest(ch: channel, params: dict<any>): void
   protocol.RequestAsync(ch, 'textDocument/definition', params, OnResponse)
-  logger.LogInfo('Request textDocument/definition: ' .. params->string())
+  logger.LogInfo('Request `textDocument/definition`: ' .. params->string())
 enddef
 
 export def Request(ch: channel, buf: number): void
@@ -33,5 +33,5 @@ export def Request(ch: channel, buf: number): void
 enddef
 
 export def Register(ch: channel, registrationOptions: any, lspClientConfig: dict<any>): void
-  logger.LogInfo('Received Dynamic Registration: textDocument/definition: ' .. registrationOptions->string())
+  logger.LogInfo('Received Dynamic Registration `textDocument/definition`: ' .. registrationOptions->string())
 enddef

@@ -1,8 +1,9 @@
 vim9script
 
-import '../../logger.vim'
 import '../../core/protocol.vim'
 import '../../core/types.vim'
+import '../../logger.vim'
+import '../../vim/popup.vim'
 
 const MessageType = types.MessageType
 
@@ -17,7 +18,7 @@ const MakeConfirmActionChoices = (actions: list<any>): string =>
 # Prompt user with an action choice via confirm() and then respond back to the
 # LSP server with the selected action
 export def HandleShowMessageRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
-  logger.LogInfo('Request Log window/showMessageRequest: ' .. request->string())
+  logger.LogInfo('Request `window/showMessageRequest`: ' .. request->string())
 
   const params = request.params
   const message = MakeConfirmMessage(params.type, params.message)
@@ -27,21 +28,23 @@ export def HandleShowMessageRequest(ch: channel, request: any, lspClientConfig: 
 
   if choiceId == 0
     protocol.ResponseAsync(ch, request.id, null)
-    logger.LogInfo('Response window/showMessageRequest: null')
+    logger.LogInfo('Response `window/showMessageRequest`: null')
   elseif choiceId > 0
     const selectedAction = params.actions[choiceId - 1]
 
     protocol.ResponseAsync(ch, request.id, selectedAction)
-    logger.LogInfo('Response window/showMessageRequest: ' .. selectedAction->string())
+    logger.LogInfo('Response `window/showMessageRequest`: ' .. selectedAction->string())
   endif
 enddef
 
 export def HandleShowMessage(request: any): void
   const params = request.params
   logger.Print(MessageType[params.type], params.message)
+  # popup.Notify(params.message, MessageType[params.type])
 enddef
 
 export def HandleLogMessage(request: any): void
   const params = request.params
   logger.Log(MessageType[params.type]->toupper(), params.message)
+  # popup.Notify(params.message, MessageType[params.type])
 enddef
