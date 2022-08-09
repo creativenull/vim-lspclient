@@ -10,24 +10,39 @@ unique besides just building web applications.
 
 ## What works
 
-Ref: [LSP Specification](https://microsoft.github.io/language-server-protocol/specifications/specification-current)
+Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-protocol/specifications/specification-current)
 
-+ Server Initialization (`initialize`, `initialized`)
-+ Document updates:
++ Server Initialization (`initialize` and `initialized`)
++ Server Shutdown (`shutdown` and `exit`)
++ Dynamic Registration Capability
+    + `workspace/didChangeConfiguration`
+    + `textDocument/declaration`
+    + `textDocument/definition`
++ Document updates
     + `textDocument/didOpen`
     + `textDocument/didChange`
     + `textDocument/didClose`
     + `textDocument/willSave`
     + `textDocument/didSave`
-+  Workspace features: 
++ Language features
+    + `textDocument/publishDiagnostics` (WIP)
+    + `textDocument/declaration` (WIP)
+    + `textDocument/definition` (WIP)
++  Workspace features 
     + `workspace/configuration`
     + `workspace/didChangeConfiguration`
-+ Server Shutdown (`shutdown`, `exit`)
+    + `workspace/workspaceFolders` (WIP)
++ Window features
+    + `window/showMessageRequest` (WIP)
+    + `window/showMessage`
+    + `window/logMessage`
+    + `window/workDoneProgress/create` (WIP)
+    + `window/workDoneProgress/cancel` (WIP)
 
 ## Installation
 ### Requirements
 
-These can also be checked with `:LSPClientCheckHealth`
+The following version and features are required, these can also be checked with `:LSPClientCheckHealth`:
 
 + Vim [v8.2.4758](https://github.com/vim/vim/tree/v8.2.4758) and up is required.
 + `+channel`
@@ -48,7 +63,9 @@ git clone https://github.com/creativenull/vim-lspclient.git ~/.vim/pack/creative
 
 ## Setup
 
-Example for `tsserver`:
+### tsserver (js/ts)
+
+Must have `typescript-language-server` installed globally with `npm i -g typescript-language-server`.
 
 ```vim
 let s:tsserver = {}
@@ -56,5 +73,75 @@ let s:tsserver.name = 'tsserver'
 let s:tsserver.cmd = ['typescript-language-server', '--stdio']
 let s:tsserver.filetypes = ['typescript', 'typescriptreact', 'javascript', 'javascriptreact']
 let s:tsserver.initOptions = { 'hostInfo': 'Vim 9' }
+
 call lspclient#Create(s:tsserver)
+```
+
+### volar (vue >= 3)
+
+Must have `vue-language-server` installed globally with `npm i -g @volar/vue-language-server`
+
+```vim
+let s:volar = {}
+let s:volar.name = 'volar'
+let s:volar.cmd = ['vue-language-server', '--stdio']
+let s:volar.filetypes = ['vue']
+
+" https://github.com/johnsoncodehk/volar/blob/d27d989355adc2aa3f9c6260226bd3167e3fac97/packages/shared/src/types.ts
+let s:volar.initOptions = {
+\   'typescript': {
+\     'serverPath': lspclient#fs#GetProjectRoot('node_modules/typescript/lib/tsserverlibrary.js'),
+\   },
+\   'documentFeatures': {
+\			'allowedLanguageIds': ['html', 'css', 'vue', 'typescript'],
+\			'selectionRange': v:true,
+\			'foldingRange': v:true,
+\			'linkedEditingRange': v:true,
+\			'documentSymbol': v:true,
+\			'documentColor': v:true,
+\			'documentFormatting': v:true,
+\   },
+\   'languageFeatures': {
+\     'references': v:true,
+\     'implementation': v:true,
+\     'definition': v:true,
+\     'typeDefinition': v:true,
+\     'callHierarchy': v:true,
+\     'hover': v:true,
+\     'rename': v:true,
+\     'renameFileRefactoring': v:true,
+\     'signatrueHelp': v:true,
+\     'completion': {
+\     	'defaultTagNameCase': 'both',
+\     	'defaultAttrNameCase': 'kebabCase',
+\     	'getDocumentNameCasesRequest': v:true,
+\     	'getDocumentSelectionRequest': v:true,
+\     },
+\     'documentHighlight': v:true,
+\     'documentLink': v:true,
+\     'workspaceSymbol': v:true,
+\     'codeLens': v:true,
+\     'semanticTokens': v:true,
+\     'codeAction': v:true,
+\     'inlayHints': v:false,
+\     'diagnostics': v:true,
+\     'schemaRequestService': v:true,
+\   },
+\ }
+
+call lspclient#Create(s:volar)
+```
+
+### deno (js/ts)
+
+Must have `deno` installed globally.
+
+```vim
+let s:denols = {}
+let s:denols.name = 'denols'
+let s:denols.cmd = ['deno', 'lsp']
+let s:denols.filetypes = ['typescript', 'typescriptreact', 'javascript', 'javascriptreact']
+let s:denols.config = { 'enable': v:true, 'unstable': v:true }
+
+call lspclient#Create(s:denols)
 ```
