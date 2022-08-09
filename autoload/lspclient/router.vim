@@ -24,13 +24,12 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
   endif
 
   if request.method == 'client/registerCapability'
-    logger.LogInfo(request.method .. ' : ' .. request->string())
     const registrations = request.params.registrations
 
     # Handle dynamicRegistration requests
     for registration in registrations->copy()
       if registration.method == 'workspace/didChangeConfiguration'
-        configuration.NotifyDidChangeConfiguration(ch, lspClientConfig)
+        configuration.Register(ch, request, lspClientConfig)
       endif
 
       if registration.method == 'textDocument/declaration'
