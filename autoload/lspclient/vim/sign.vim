@@ -86,6 +86,10 @@ export def Unplace(id: number): void
 enddef
 
 export def UnplaceBuffer(buf: number): void
+  if !buf->bufexists()
+    return
+  endif
+
   sign_unplace(namespace, { buffer: buf })
 enddef
 
