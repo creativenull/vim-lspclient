@@ -8,7 +8,15 @@ export def HandleConfigurationRequest(ch: channel, request: any, lspClientConfig
   logger.LogInfo('Response `workspace/configuration`: ' .. lspClientConfig.config->string())
 enddef
 
-export def NotifyDidChangeConfiguration(ch: channel, lspClientConfig: any): void
-  protocol.NotifyAsync(ch, 'workspace/didChangeConfiguration', { settings: lspClientConfig.config })
-  logger.LogInfo('Notify `workspace/didChangeConfiguration`: ' .. lspClientConfig.config->string())
+export def Register(ch: channel, request: any, lspClientConfig: dict<any>): void
+  def NotifyChange(_timerId: any): void
+    protocol.NotifyAsync(ch, 'workspace/didChangeConfiguration', { settings: lspClientConfig.config })
+    logger.LogInfo('Notify `workspace/didChangeConfiguration`: ' .. lspClientConfig.config->string())
+  enddef
+
+  protocol.ResponseAsync(ch, request.id)
+  logger.LogInfo('Response Successful Registration `workspace/didChangeConfiguration`')
+
+  # Send a didChangeConfiguration notif after some time
+  timer_start(2000, NotifyChange)
 enddef
