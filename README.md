@@ -141,7 +141,7 @@ let s:denols = {}
 let s:denols.name = 'denols'
 let s:denols.cmd = ['deno', 'lsp']
 let s:denols.filetypes = ['typescript', 'typescriptreact', 'javascript', 'javascriptreact']
-let s:denols.config = { 'enable': v:true, 'unstable': v:true }
+let s:denols.settings = { 'enable': v:true, 'unstable': v:true }
 
 call lspclient#Create(s:denols)
 ```

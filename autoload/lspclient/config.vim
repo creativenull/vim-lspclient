@@ -7,15 +7,15 @@ vim9script
 #   markers: list<string>;
 #   initOptions?: dict<any>;
 #   capabilities?: dict<any>;
-#   config?: dict<any>;
+#   settings?: dict<any>;
 # }
 
 export def MergeLspClientConfig(partialLspClientConfig: dict<any>): dict<any>
   const defaults = {
-    initOptions: null_dict,
     capabilities: null_dict,
-    config: null_dict,
+    initOptions: null_dict,
     markers: null_list,
+    settings: null_dict,
   }
 
   return defaults->extendnew(partialLspClientConfig)
