@@ -14,12 +14,13 @@ def MakeRequest(ch: channel, params: dict<any>): void
 enddef
 
 export def Request(ch: channel, buf: number): void
+  const filepath = buf->bufname()->fnamemodify(':p')
   const curpos = getcurpos()
   const line = curpos[1]
   const col = curpos[2]
   const params = {
     textDocument: {
-      uri: fs.ProjectFileToUri(buf->bufname()),
+      uri: fs.FileToUri(filepath),
     },
     position: {
       line: line - 1,

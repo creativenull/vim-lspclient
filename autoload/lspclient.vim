@@ -92,7 +92,7 @@ enddef
 
 # Make a callback for every client attached to a buffer
 def RequestForEachClient(Callback: func): void
-  const buf = bufnr('%')
+  const buf = bufnr()
   const registeredClients = lspClients->keys()
 
   if registeredClients->empty()
@@ -133,22 +133,31 @@ enddef
 # ---
 
 export def DocumentWillSave(id: string, buf: number): void
-  if buf->getbufvar('&modified')
-    document.NotifyWillSave(GetChannel(id), { uri: fs.ProjectFileToUri(buf->bufname()) })
+  const filepath = buf->bufname()->fnamemodify(':p')
+  const isModified = buf->getbufvar('&modified')
+
+  if isModified
+    document.NotifyWillSave(GetChannel(id), { uri: fs.FileToUri(filepath) })
   endif
 enddef
 
 export def DocumentDidSave(id: string, buf: number, includeText = false): void
-  if buf->getbufvar('&modified')
+  const isModified = buf->getbufvar('&modified')
+
+  if isModified
+    const filepath = buf->bufname()->fnamemodify(':p')
+
     document.NotifyDidSave(GetChannel(id), {
-      uri: fs.ProjectFileToUri(buf->bufname()),
+      uri: fs.FileToUri(filepath),
       text: includeText ? fs.GetBufferContents(buf->bufname()) : null,
     })
   endif
 enddef
 
 export def DocumentDidChange(id: string, buf: number): void
-  if buf->getbufvar('&modified')
+  const isModified = buf->getbufvar('&modified')
+
+  if isModified
     # TODO: Figure out a way to be able to create diffs instead of
     #       sending the entire buffer.
     #
@@ -156,9 +165,10 @@ export def DocumentDidChange(id: string, buf: number): void
     #         + Implement Myers's O(ND) algorithm (caveat: need time to learn it)
     #         + Use listener_add() to provided changes (caveat: only works on insert mode, might need to debounce)
     const contentChanges = [{ text: fs.GetBufferContents(buf) }]
+    const filepath = buf->bufname()->fnamemodify(':p')
 
     document.NotifyDidChange(GetChannel(id), {
-      uri: fs.ProjectFileToUri(buf->bufname()),
+      uri: fs.FileToUri(filepath),
       version: buf->getbufvar('changedtick'),
       changes: contentChanges,
     })
@@ -166,7 +176,8 @@ export def DocumentDidChange(id: string, buf: number): void
 enddef
 
 export def DocumentDidOpen(id: string): void
-  const buf = bufnr('%')
+  const buf = bufnr()
+  const filepath = buf->bufname()->fnamemodify(':p')
   const ft = buf->getbufvar('&filetype')
   const isFileType = GetConfig(id).filetypes->index(ft) != -1
 
@@ -175,7 +186,7 @@ export def DocumentDidOpen(id: string): void
   endif
 
   document.NotifyDidOpen(GetChannel(id), {
-    uri: fs.ProjectFileToUri(buf->bufname()),
+    uri: fs.FileToUri(filepath),
     filetype: ft,
     version: buf->getbufvar('changedtick'),
     contents: fs.GetBufferContents(buf),
@@ -235,9 +246,10 @@ export def DocumentDidOpen(id: string): void
 enddef
 
 export def DocumentDidClose(id: string, buf: number): void
-  RemoveDocument(id, buf)
+  const filepath = buf->bufname()->fnamemodify(':p')
 
   # Unsubscribe from changes and events
+  RemoveDocument(id, buf)
   autocmd_delete([
     {
       group: GetEventGroup(id),
@@ -251,7 +263,7 @@ export def DocumentDidClose(id: string, buf: number): void
     },
   ])
   
-  document.NotifyDidClose(GetChannel(id), { uri: fs.ProjectFileToUri(buf->bufname()) })
+  document.NotifyDidClose(GetChannel(id), { uri: fs.FileToUri(filepath) })
 enddef
 
 # LSP Server functions
