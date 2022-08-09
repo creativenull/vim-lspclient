@@ -4,11 +4,11 @@ vim9script
 # :messages and a log file.
 
 const logFilepath = expand('~/.cache/vim/lspclient.log')
-const echoPrefix = '[LSPCLIENT]'
-const level = {
-  ERROR: 'ERROR',
-  DEBUG: 'DEBUG',
-  INFO: 'INFO',
+const messagesPrefix = '[LSPCLIENT]'
+const Level = {
+  Error: 'ERROR',
+  Debug: 'DEBUG',
+  Info: 'INFO',
 }
 
 # Get the current timestamp format for logfiles
@@ -32,50 +32,64 @@ def WriteLogFile(msg: string): void
 enddef
 
 # Generic format for messages to be logged as
-def Render(levelType: string, msg: string): string
-  return printf('%s: %s', levelType, msg)
+def Render(level: string, msg: string): string
+  return printf('%s: %s', level, msg)
 enddef
 
 # Logs to be printed to :messages
-export def Print(levelType: string, msg: string): void
-  echom printf('%s %s', echoPrefix, Render(levelType, msg))
+export def Print(level: string, msg: string): void
+  echom printf('%s %s', messagesPrefix, Render(level, msg))
 enddef
 
 # Log to be writted to logfiles
-export def Log(levelType: string, msg: string): void
+export def Log(level: string, msg: string): void
   EnsureLogFile()
-  WriteLogFile(printf('[%s] %s', GetTime(), Render(levelType, msg)))
+  WriteLogFile(printf('[%s] %s', GetTime(), Render(level, msg)))
 enddef
 
 # Debug Functions
 # ---
-export const Debug = (msg: string): string => Render(level.DEBUG, msg)
-export const PrintDebug = (msg: string): void => {
-  Print(level.DEBUG, msg)
-}
-export const LogDebug = (msg: string): void => {
-  Log(level.DEBUG, msg)
-}
+export const Debug = (msg: string): string => Render(Level.Debug, msg)
+
+export def PrintDebug(msg: string): void
+  if !exists('g:lspclient_debug')
+    return
+  endif
+
+  Print(Level.Debug, msg)
+enddef
+
+export def LogDebug(msg: string): void
+  if !exists('g:lspclient_debug')
+    return
+  endif
+
+  Log(Level.Debug, msg)
+enddef
 
 # Info Functions
 # ---
-export const Info = (msg: string): string => Render(level.INFO, msg)
-export const PrintInfo = (msg: string): void => {
-  Print(level.INFO, msg)
-}
-export const LogInfo = (msg: string): void => {
-  Log(level.INFO, msg)
-}
+export const Info = (msg: string): string => Render(Level.Info, msg)
+
+export def PrintInfo(msg: string): void
+  Print(Level.Info, msg)
+enddef
+
+export def LogInfo(msg: string): void
+  Log(Level.Info, msg)
+enddef
 
 # Error Functions
 # ---
-export const Error = (msg: string): string => Render(level.ERROR, msg)
-export const PrintError = (msg: string): void => {
-  Print(level.ERROR, msg)
-}
-export const LogError = (msg: string): void => {
-  Log(level.ERROR, msg)
-}
+export const Error = (msg: string): string => Render(Level.Error, msg)
+
+export def PrintError(msg: string): void
+  Print(Level.Error, msg)
+enddef
+
+export def LogError(msg: string): void
+  Log(Level.Error, msg)
+enddef
 
 # Log Utils
 # ---
