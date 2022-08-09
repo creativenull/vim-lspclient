@@ -18,7 +18,7 @@ const MakeConfirmActionChoices = (actions: list<any>): string =>
 # Prompt user with an action choice via confirm() and then respond back to the
 # LSP server with the selected action
 export def HandleShowMessageRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
-  logger.LogInfo('Request `window/showMessageRequest`: ' .. request->string())
+  logger.LogDebug('Request `window/showMessageRequest`: ' .. request->string())
 
   const params = request.params
   const message = MakeConfirmMessage(params.type, params.message)
@@ -28,12 +28,12 @@ export def HandleShowMessageRequest(ch: channel, request: any, lspClientConfig: 
 
   if choiceId == 0
     protocol.ResponseAsync(ch, request.id, null)
-    logger.LogInfo('Response `window/showMessageRequest`: null')
+    logger.LogDebug('Response `window/showMessageRequest`: null')
   elseif choiceId > 0
     const selectedAction = params.actions[choiceId - 1]
 
     protocol.ResponseAsync(ch, request.id, selectedAction)
-    logger.LogInfo('Response `window/showMessageRequest`: ' .. selectedAction->string())
+    logger.LogDebug('Response `window/showMessageRequest`: ' .. selectedAction->string())
   endif
 enddef
 

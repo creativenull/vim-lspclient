@@ -283,7 +283,7 @@ export def LspStartServer(id: string): void
 
     # Store server capabilities
     lspClients[id].serverCapabilities = response.result.capabilities
-    logger.LogInfo('SERVER CAPABILITIES: ' .. response->string())
+    logger.LogDebug('SERVER CAPABILITIES: ' .. response->string())
 
     client.Initialized(ch)
 
@@ -302,7 +302,7 @@ export def LspStartServer(id: string): void
   enddef
 
   def OnStdout(ch: channel, data: any): void
-    logger.LogInfo('STDOUT : ' .. data->string())
+    logger.LogDebug('STDOUT : ' .. data->string())
     router.HandleServerRequest(ch, data, GetConfig(id))
   enddef
 
@@ -326,7 +326,7 @@ export def LspStartServer(id: string): void
 
   const lspClientConfig = GetConfig(id)
 
-  logger.PrintInfo('Starting LSP Server: ' .. lspClientConfig.name)
+  logger.LogInfo('Starting LSP Server: ' .. lspClientConfig.name)
 
   const job = job_start(lspClientConfig.cmd, jobOpts)
   const channel = job_getchannel(job)

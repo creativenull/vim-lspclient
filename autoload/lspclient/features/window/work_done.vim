@@ -8,7 +8,7 @@ var tokens = []
 export def Create(ch: channel, request: any): void
   tokens->add(request.params.token)
   protocol.ResponseAsync(ch, request.id, {})
-  logger.LogInfo('Response `window/workDoneProgress/create`: {}')
+  logger.LogDebug('Response `window/workDoneProgress/create`: {}')
 enddef
 
 export def Cancel(ch: channel, token: any): void
@@ -18,6 +18,6 @@ export def Cancel(ch: channel, token: any): void
     tokens->remove(idx)
     const params = { token: token }
     protocol.NotifyAsync(ch, 'window/workDoneProgress/cancel', params)
-    logger.LogInfo('Notify `window/workDoneProgress/cancel`: ' .. params->string())
+    logger.LogDebug('Notify `window/workDoneProgress/cancel`: ' .. params->string())
   endif
 enddef

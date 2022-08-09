@@ -34,10 +34,10 @@ export def Initialize(
 
   protocol.RequestAsync(ch, 'initialize', params, opts.callback)
 
-  logger.LogInfo('INITIALIZE rootUri: ' .. params.rootUri)
-  logger.LogInfo('INITIALIZE workspaceFolders: ' .. params.workspaceFolders->string())
-  logger.LogInfo('INITIALIZE clientCapabilities: ' .. clientCapabilities->string())
-  logger.LogInfo('INITIALIZE initializationOptions: ' .. initializationOptions->string())
+  logger.LogDebug('INITIALIZE rootUri: ' .. params.rootUri)
+  logger.LogDebug('INITIALIZE workspaceFolders: ' .. params.workspaceFolders->string())
+  logger.LogDebug('INITIALIZE clientCapabilities: ' .. clientCapabilities->string())
+  logger.LogDebug('INITIALIZE initializationOptions: ' .. initializationOptions->string())
 enddef
 
 # Notify the server when client has initialized

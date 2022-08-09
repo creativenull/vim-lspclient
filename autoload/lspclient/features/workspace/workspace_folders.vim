@@ -16,7 +16,7 @@ enddef
 export def HandleWorkspaceFoldersRequest(ch: channel, request: any): void
   const result = GetWorkspaceFolders()
   protocol.ResponseAsync(ch, request.id, result)
-  logger.LogInfo('Response workspace/workspaceFolders: ' .. result->string())
+  logger.LogDebug('Response workspace/workspaceFolders: ' .. result->string())
 enddef
 
 def HandleDidChangeWorkspaceFoldersRequest(ch: channel, request: any): void
