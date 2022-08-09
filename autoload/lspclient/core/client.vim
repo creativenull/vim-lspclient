@@ -67,5 +67,7 @@ enddef
 # Request a client shutdown to the server
 export def Shutdown(ch: channel): void
   protocol.RequestAsync(ch, 'shutdown', {}, OnShutdown)
+
   logger.LogInfo('LSP Issue Shutdown')
+  logger.LogInfo('<======= LSP CLIENT LOG STOP =======>')
 enddef

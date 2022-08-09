@@ -326,6 +326,7 @@ export def LspStartServer(id: string): void
 
   const lspClientConfig = GetConfig(id)
 
+  logger.LogInfo('<======= LSP CLIENT LOG START =======>')
   logger.LogInfo('Starting LSP Server: ' .. lspClientConfig.name)
 
   const job = job_start(lspClientConfig.cmd, jobOpts)
@@ -335,7 +336,6 @@ export def LspStartServer(id: string): void
   SetChannel(id, channel)
 
   # Start the initialization process
-  logger.LogInfo('<======= LSP CLIENT LOG =======>')
   client.Initialize(GetChannel(id), {
     lspClientConfig: lspClientConfig,
     callback: OnInitialize,
@@ -347,7 +347,6 @@ export def LspStopServer(id: string): void
     return
   endif
 
-  logger.LogInfo('<======= LSP CLIENT SHUTDOWN PHASE =======>')
   client.Shutdown(GetChannel(id))
 enddef
 
