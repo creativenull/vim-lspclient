@@ -49,14 +49,14 @@ enddef
 # Handle generic response back to LSP server
 # RequestID is required
 # Result and Error are optional
-export def ResponseAsync(ch: channel, requestId: any, result = null, error = null): void
+export def ResponseAsync(ch: channel, requestId: any, result: any, error = null_dict): void
   var response = { id: requestId }
 
-  if result != null && error == null
+  if !result->empty() && error->empty()
     response.result = result
-  elseif result == null && error != null
+  elseif result->empty() && !error->empty()
     response.error = error
-  elseif result == null && error == null
+  elseif result->empty() && error->empty()
     # Successful response, but with empty result
     response.result = result
   else

@@ -27,7 +27,7 @@ export def HandleShowMessageRequest(ch: channel, request: any, lspClientConfig: 
   var choiceId = confirm(message, choice, 1, MessageType[params.type])
 
   if choiceId == 0
-    protocol.ResponseAsync(ch, request.id, null)
+    protocol.ResponseAsync(ch, request.id, {})
     logger.LogDebug('Response `window/showMessageRequest`: null')
   elseif choiceId > 0
     const selectedAction = params.actions[choiceId - 1]

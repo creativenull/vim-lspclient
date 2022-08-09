@@ -14,7 +14,7 @@ export def Register(ch: channel, request: any, lspClientConfig: dict<any>): void
     logger.LogDebug('Notify `workspace/didChangeConfiguration`: ' .. lspClientConfig.config->string())
   enddef
 
-  protocol.ResponseAsync(ch, request.id)
+  protocol.ResponseAsync(ch, request.id, {})
   logger.LogDebug('Response Successful Registration `workspace/didChangeConfiguration`')
 
   # Send a didChangeConfiguration notif after some time
