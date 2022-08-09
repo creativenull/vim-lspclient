@@ -52,7 +52,7 @@ enddef
 export const Debug = (msg: string): string => Render(Level.Debug, msg)
 
 export def PrintDebug(msg: string): void
-  if !exists('g:lspclient_debug')
+  if !exists('g:lspclient_debug') || (exists('g:lspclient_debug') && !g:lspclient_debug)
     return
   endif
 
@@ -60,7 +60,7 @@ export def PrintDebug(msg: string): void
 enddef
 
 export def LogDebug(msg: string): void
-  if !exists('g:lspclient_debug')
+  if !exists('g:lspclient_debug') || (exists('g:lspclient_debug') && !g:lspclient_debug)
     return
   endif
 
