@@ -132,52 +132,8 @@ enddef
 # Buffer/Document sync
 # ---
 
-export def DocumentWillSave(id: string, buf: number): void
-  const filepath = buf->bufname()->fnamemodify(':p')
-  const isModified = buf->getbufvar('&modified')
-
-  if isModified
-    document.NotifyWillSave(GetChannel(id), { uri: fs.FileToUri(filepath) })
-  endif
-enddef
-
-export def DocumentDidSave(id: string, buf: number, includeText = false): void
-  const isModified = buf->getbufvar('&modified')
-
-  if isModified
-    const filepath = buf->bufname()->fnamemodify(':p')
-
-    document.NotifyDidSave(GetChannel(id), {
-      uri: fs.FileToUri(filepath),
-      text: includeText ? fs.GetBufferContents(buf->bufname()) : null,
-    })
-  endif
-enddef
-
-export def DocumentDidChange(id: string, buf: number): void
-  const isModified = buf->getbufvar('&modified')
-
-  if isModified
-    # TODO: Figure out a way to be able to create diffs instead of
-    #       sending the entire buffer.
-    #
-    #       Possible solutions: 
-    #         + Implement Myers's O(ND) algorithm (caveat: need time to learn it)
-    #         + Use listener_add() to provided changes (caveat: only works on insert mode, might need to debounce)
-    const contentChanges = [{ text: fs.GetBufferContents(buf) }]
-    const filepath = buf->bufname()->fnamemodify(':p')
-
-    document.NotifyDidChange(GetChannel(id), {
-      uri: fs.FileToUri(filepath),
-      version: buf->getbufvar('changedtick'),
-      changes: contentChanges,
-    })
-  endif
-enddef
-
 export def DocumentDidOpen(id: string): void
   const buf = bufnr()
-  const filepath = buf->bufname()->fnamemodify(':p')
   const ft = buf->getbufvar('&filetype')
   const isFileType = GetConfig(id).filetypes->index(ft) != -1
 
@@ -185,17 +141,12 @@ export def DocumentDidOpen(id: string): void
     return
   endif
 
-  document.NotifyDidOpen(GetChannel(id), {
-    uri: fs.FileToUri(filepath),
-    filetype: ft,
-    version: buf->getbufvar('changedtick'),
-    contents: fs.GetBufferContents(buf),
-  })
+  document.NotifyDidOpen(GetChannel(id), buf)
 
   # Track this document lifecycle, include any other refs
   TrackDocument(id, { bufnr: buf })
 
-  # Subscribe to buffer event until closed
+  # Subscribe to buffer events until closed
   const textDocumentSync = GetServerCapabilities(id)->get('textDocumentSync', {})
   var documentEvents = [
     {
@@ -245,25 +196,39 @@ export def DocumentDidOpen(id: string): void
   autocmd_add(documentEvents)
 enddef
 
-export def DocumentDidClose(id: string, buf: number): void
-  const filepath = buf->bufname()->fnamemodify(':p')
+export def DocumentDidChange(id: string, buf: number): void
+  if !buf->getbufvar('&modified')
+    return
+  endif
 
+  document.NotifyDidChange(GetChannel(id), buf)
+enddef
+
+export def DocumentDidClose(id: string, buf: number): void
   # Unsubscribe from changes and events
   RemoveDocument(id, buf)
   autocmd_delete([
-    {
-      group: GetEventGroup(id),
-      event: changeBufEvents,
-      bufnr: buf,
-    },
-    {
-      group: GetEventGroup(id),
-      event: closeBufEvents,
-      bufnr: buf,
-    },
+    { group: GetEventGroup(id), event: changeBufEvents, bufnr: buf },
+    { group: GetEventGroup(id), event: closeBufEvents, bufnr: buf },
   ])
   
-  document.NotifyDidClose(GetChannel(id), { uri: fs.FileToUri(filepath) })
+  document.NotifyDidClose(GetChannel(id), buf)
+enddef
+
+export def DocumentWillSave(id: string, buf: number): void
+  if !buf->getbufvar('&modified')
+    return
+  endif
+
+  document.NotifyWillSave(GetChannel(id), buf)
+enddef
+
+export def DocumentDidSave(id: string, buf: number, includeText = false): void
+  if !buf->getbufvar('&modified')
+    return
+  endif
+
+  document.NotifyDidSave(GetChannel(id), buf, includeText)
 enddef
 
 # LSP Server functions

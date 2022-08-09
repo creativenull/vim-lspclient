@@ -13,6 +13,12 @@ export def UriToFile(uri: string): string
   return uri[7 :]
 enddef
 
+# Fullpath of buffer file to uri
+export def BufferToUri(buf: number): string
+  const filepath = buf->bufname()->fnamemodify(':p')
+  return FileToUri(filepath)
+enddef
+
 export def GetProjectRoot(extendPath: string = ''): string
   if !extendPath->empty()
     if extendPath[0] == '/'
