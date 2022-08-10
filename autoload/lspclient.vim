@@ -121,9 +121,10 @@ export def PopupDiagnosticAtCursor(): void
 
   if !loclist->empty()
     for loc in loclist
-      if loc.bufnr == buf && loc.lnum == curlnum && loc.col == curcol
+      if loc.bufnr == buf && loc.lnum == curlnum && (curcol >= loc.col && curcol <= loc.end_col)
         const hasLines = loc.text->match("\n") != -1
-        popup.Cursor(hasLines ? loc.text->split("\n") : loc.text, popup.SeverityType[loc.type])
+        const content = hasLines ? loc.text->split("\n") : loc.text
+        popup.Cursor(content, popup.SeverityType[loc.type])
       endif
     endfor
   endif
