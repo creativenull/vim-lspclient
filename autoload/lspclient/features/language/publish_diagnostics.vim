@@ -8,6 +8,13 @@ import '../../vim/sign.vim'
 # Track by each buffer
 var bufferLocationList = {}
 
+const LocationListSeverity = {
+  'E': 'Error',
+  'W': 'Warning',
+  'I': 'Info',
+  'H': 'Hint',
+}
+
 const DiagnosticSeverity = types.DiagnosticSeverity
 const SignSeverity = sign.SeverityType
 
@@ -37,12 +44,45 @@ def CreateLocList(diagnostics: list<any>, buf: number, lspClientConfig: dict<any
   return diagnostics->mapnew(MapLocList)
 enddef
 
+def LocListTextFunc(info: dict<any>): list<string>
+  var textFormats = []
+  const list = getloclist(info.winid)
+  for item in list
+    const filename = bufname(item.bufnr)
+    textFormats->add(printf('%s:%s:%s %s - %s', filename, item.lnum, item.col, LocationListSeverity[item.type], item.text))
+  endfor
+
+  return textFormats
+enddef
+
 def CreateSigns(diagnostics: list<any>, buf: number): list<any>
   return diagnostics->mapnew((i, diagnostic) => ({
     buf: buf,
     lnum: diagnostic.range.start.line + 1,
     level: SignSeverity[DiagnosticSeverity[diagnostic.severity]],
   }))
+enddef
+
+def ClearBufTextProps(buf: number): void
+  prop_remove({ type: 'LSPClientDiagnosticPropTextError', bufnr: buf })
+  prop_remove({ type: 'LSPClientDiagnosticPropTextWarning', bufnr: buf })
+  prop_remove({ type: 'LSPClientDiagnosticPropTextHint', bufnr: buf })
+  prop_remove({ type: 'LSPClientDiagnosticPropTextInfo', bufnr: buf })
+enddef
+
+def RenderBufTextProps(buf: number, loclist: list<any>): void
+  for item in loclist
+    # Get byte index and not a number for column
+    const col = virtcol2col(0, item.lnum, item.col)
+
+    if col > 0
+      prop_add(item.lnum, col, {
+        bufnr: buf,
+        end_col: item.end_col,
+        type: printf('LSPClientDiagnosticPropText%s', LocationListSeverity[item.type]),
+      })
+    endif
+  endfor
 enddef
 
 # Handle diagnostics to a location list and signs.
@@ -64,13 +104,22 @@ export def HandleRequest(request: any, lspClientConfig: dict<any>): void
 
   # Merge for every buffer and then set
   for b in bufferLocationList->keys()
-    loclist->extend(bufferLocationList[b])
+    loclist = loclist->extendnew(bufferLocationList[b])
   endfor
 
-  setloclist(0, loclist, 'r')
+  setloclist(0, [], 'r')
+  setloclist(0, [], 'a', {
+    title: 'LSPClient Diagnostics',
+    items: loclist,
+    quickfixtextfunc: LocListTextFunc,
+  })
 
-  # Generate signs from diagnostics with a clean slate
+  # Re-render signs for generated diagnostics
   sign.UnplaceBuffer(buf)
   const signs = CreateSigns(diagnostics, buf)
   sign.PlaceList(signs)
+
+  # Re-render prop text for generated diagnostics
+  ClearBufTextProps(buf)
+  RenderBufTextProps(buf, loclist)
 enddef
