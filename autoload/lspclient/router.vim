@@ -13,14 +13,20 @@ import './logger.vim'
 export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
   if request.method == 'workspace/configuration'
     configuration.HandleConfigurationRequest(ch, request, lspClientConfig)
+
+    return
   endif
 
   if request.method == 'workspace/workspaceFolders'
     workspace_folders.HandleWorkspaceFoldersRequest(ch, request)
+
+    return
   endif
 
   if request.method == 'textDocument/publishDiagnostics'
     publish_diagnostics.HandleRequest(request, lspClientConfig)
+
+    return
   endif
 
   if request.method == 'client/registerCapability'
@@ -46,17 +52,25 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
   # --
   if request.method == 'window/showMessageRequest'
     message.HandleShowMessageRequest(ch, request, lspClientConfig)
+
+    return
   endif
 
   if request.method == 'window/showMessage'
     message.HandleShowMessage(request)
+
+    return
   endif
 
   if request.method == 'window/logMessage'
     message.HandleLogMessage(request)
+
+    return
   endif
 
   if request.method == 'window/workDoneProgress/create'
     work_done.Create(ch, request)
+
+    return
   endif
 enddef
