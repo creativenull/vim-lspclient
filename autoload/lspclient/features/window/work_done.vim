@@ -5,6 +5,10 @@ import '../../logger.vim'
 
 var tokens = []
 
+export def HasToken(progressToken: string): bool
+  return tokens->index(progressToken) != -1
+enddef
+
 export def Create(ch: channel, request: any): void
   tokens->add(request.params.token)
   protocol.ResponseAsync(ch, request.id, {})
