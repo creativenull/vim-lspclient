@@ -16,13 +16,13 @@ export const SeverityType = {
 # Using tailwindcss colors
 export def DefineHighlights(): void
   hlset([
-    { name: 'LSPClientSignError', guifg: colors.Error, gubg: 'NONE' },
+    { name: 'LSPClientSignError', guifg: colors.Error, guibg: 'NONE' },
     { name: 'LSPClientSignErrorLine', guifg: colors.Error, guibg: 'NONE', gui: { underline: true } },
-    { name: 'LSPClientSignWarning', guifg: colors.Warning, gubg: 'NONE' },
+    { name: 'LSPClientSignWarning', guifg: colors.Warning, guibg: 'NONE' },
     { name: 'LSPClientSignWarningLine', guifg: colors.Warning, guibg: 'NONE', gui: { underline: true } },
-    { name: 'LSPClientSignInfo', guifg: colors.Info, gubg: 'NONE' },
+    { name: 'LSPClientSignInfo', guifg: colors.Info, guibg: 'NONE' },
     { name: 'LSPClientSignInfoLine', guifg: colors.Info, guibg: 'NONE' },
-    { name: 'LSPClientSignHint', guifg: colors.Hint, gubg: 'NONE' },
+    { name: 'LSPClientSignHint', guifg: colors.Hint, guibg: 'NONE' },
     { name: 'LSPClientSignHintLine', guifg: colors.Hint, guibg: 'NONE' },
   ])
 enddef
