@@ -25,7 +25,7 @@ Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-proto
     + `textDocument/willSave`
     + `textDocument/didSave`
 + Language features
-    + `textDocument/publishDiagnostics` (WIP)
+    + `textDocument/publishDiagnostics`
     + `textDocument/declaration` (WIP)
     + `textDocument/definition` (WIP)
 +  Workspace features 
