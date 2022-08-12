@@ -5,8 +5,25 @@ import '../../fs.vim'
 import '../../logger.vim'
 import '../../random.vim'
 
+# Get the file path relative to the project root
 def RelativeFilepath(filepath: string): string
   return substitute(filepath, fs.GetProjectRoot('/'), '', '')
+enddef
+
+# Handle Location type result
+def GoToLocation(location: dict<any>): void
+  const filepath = RelativeFilepath(fs.UriToFile(location.uri))
+  const lnum = location.range.start.line + 1
+
+  execute printf("edit +%d %s", lnum, filepath)
+enddef
+
+# Handle LocationLink type result
+def GoToLocationLink(location: dict<any>): void
+  const filepath = RelativeFilepath(fs.UriToFile(location.targetUri))
+  const lnum = location.targetRange.start.line + 1
+
+  execute printf("edit +%d %s", lnum, filepath)
 enddef
 
 def OnResponse(ch: channel, response: any): void
@@ -30,6 +47,15 @@ def OnResponse(ch: channel, response: any): void
   if result->type() == v:t_list
     if result->len() == 1
       const location = result[0]
+
+      # Handle Location or LocationLink
+      if !location->get('targetUri', '')->empty()
+        GoToLocationLink(location)
+      else
+        GoToLocation(location)
+      endif
+
+
       const filepath = RelativeFilepath(fs.UriToFile(location.uri))
       const lnum = location.range.start.line + 1
 
@@ -41,12 +67,20 @@ def OnResponse(ch: channel, response: any): void
       var qlist = []
 
       for item in result
-        qlist->add({
-          filename: RelativeFilepath(fs.UriToFile(item.uri)),
-          lnum: item.range.start.line + 1,
-          col: item.range.start.character + 1,
-          valid: false,
-        })
+        var qfItem = {}
+
+        # Handle Location or LocationLink
+        if item->get('targetUri', '')->empty()
+          qfItem.filename = RelativeFilepath(fs.UriToFile(item.uri))
+          qfItem.lnum = item.range.start.line + 1
+          qfItem.col = item.range.start.character + 1
+        else
+          qfItem.filename = RelativeFilepath(fs.UriToFile(item.targetUri))
+          qfItem.lnum = item.targetRange.start.line + 1
+          qfItem.col = item.targetRange.start.character + 1
+        endif
+
+        qlist->add(qfItem->extendnew({ valid: false }))
       endfor
 
       setqflist(qlist, 'r')
