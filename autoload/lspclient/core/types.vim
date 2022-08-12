@@ -12,7 +12,7 @@ export const DiagnosticTag = {
   Deprecated: 2,
   1: 'Unnecessary',
   2: 'Deprecated',
-  }
+}
 
 export const DiagnosticSeverity = {
   1: 'E',
