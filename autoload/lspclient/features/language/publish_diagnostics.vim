@@ -18,49 +18,97 @@ const LocationListSeverity = {
 const DiagnosticSeverity = types.DiagnosticSeverity
 const SignSeverity = sign.SeverityType
 
-def CreateLocListTextFormat(message: string, source: string, severity: string, code: any): string
+# Change from 0-based index to 1-based for lines and cols
+# Returns a List with values: [lnum, col, end_lnum, end_col]
+def RangeOffset(range: dict<any>): list<number>
+  var offsets = []
+
+  offsets->add(range.start.line + 1)
+  offsets->add(range.start.character + 1)
+
+  offsets->add(range.end.line + 1)
+  offsets->add(range.end.character + 1)
+
+  return offsets
+enddef
+
+def LocationListText(message: string, source: string, severity: string, code: any): string
   return printf('%s [%s %s%s]', message, source, severity, code)
 enddef
 
-def CreateLocList(diagnostics: list<any>, buf: number, lspClientConfig: dict<any>): list<any>
+def MakeBufLocationList(buf: number, diagnostics: list<any>, lspClientConfig: dict<any>): list<any>
   def MapLocList(_i: number, diagnostic: dict<any>): dict<any>
     const code = diagnostic->get('code') != 0 ? diagnostic.code : 0
     const source = diagnostic->get('source', lspClientConfig.name)
     const message = diagnostic.message
     const severity = DiagnosticSeverity[diagnostic.severity]
+    const [lnum, col, end_lnum, end_col] = RangeOffset(diagnostic.range)
 
     return {
       bufnr: buf,
-      text: CreateLocListTextFormat(message, source, severity, code),
+      text: LocationListText(message, source, severity, code),
       nr: code,
       type: severity,
-      lnum: diagnostic.range.start.line + 1,
-      col: diagnostic.range.start.character + 1,
-      end_lnum: diagnostic.range.end.line + 1,
-      end_col: diagnostic.range.end.character + 1,
+      lnum: lnum,
+      col: col,
+      end_lnum: end_lnum,
+      end_col: end_col,
     }
   enddef
 
   return diagnostics->mapnew(MapLocList)
 enddef
 
-def LocListTextFunc(info: dict<any>): list<string>
+def LocationListTextFunc(info: dict<any>): list<string>
   var textFormats = []
   const list = getloclist(info.winid)
   for item in list
     const filename = bufname(item.bufnr)
-    textFormats->add(printf('%s:%s:%s %s - %s', filename, item.lnum, item.col, LocationListSeverity[item.type], item.text))
+    const text = printf('%s:%s:%s %s - %s', filename, item.lnum, item.col, LocationListSeverity[item.type], item.text)
+
+    textFormats->add(text)
   endfor
 
   return textFormats
 enddef
 
-def CreateSigns(diagnostics: list<any>, buf: number): list<any>
-  return diagnostics->mapnew((i, diagnostic) => ({
+def RenderBufLocationList(buf: number, diagnostics: list<any>, lspClientConfig: dict<any>): void
+  # Reset
+  var loclist = []
+
+  if diagnostics->empty()
+    bufferLocationList[buf] = []
+  else
+    bufferLocationList[buf] = MakeBufLocationList(buf, diagnostics, lspClientConfig)
+  endif
+
+  # Merge for every buffer and then set
+  for b in bufferLocationList->keys()
+    loclist = loclist->extendnew(bufferLocationList[b])
+  endfor
+
+  setloclist(0, [], 'r')
+  setloclist(0, [], 'a', {
+    title: 'LSPClient Diagnostics',
+    items: loclist,
+    quickfixtextfunc: LocationListTextFunc,
+  })
+enddef
+
+def ClearBufSigns(buf: number): void
+  sign.UnplaceBuffer(buf)
+enddef
+
+def RenderBufSigns(buf: number, diagnostics: list<any>): void
+  ClearBufSigns(buf)
+
+  const signs = diagnostics->mapnew((_i, diagnostic) => ({
     buf: buf,
     lnum: diagnostic.range.start.line + 1,
     level: SignSeverity[DiagnosticSeverity[diagnostic.severity]],
   }))
+
+  sign.PlaceList(signs)
 enddef
 
 def ClearBufTextProps(buf: number): void
@@ -70,16 +118,21 @@ def ClearBufTextProps(buf: number): void
   prop_remove({ type: 'LSPClientDiagnosticPropTextInfo', bufnr: buf })
 enddef
 
-def RenderBufTextProps(buf: number, loclist: list<any>): void
-  for item in loclist
-    # Get byte index and not a number for column
-    const col = virtcol2col(0, item.lnum, item.col)
+def RenderBufTextProps(buf: number, diagnostics: list<any>): void
+  ClearBufTextProps(buf)
 
-    if col > 0
-      prop_add(item.lnum, col, {
+  for diagnostic in diagnostics
+    const [lnum, col, _, end_col] = RangeOffset(diagnostic.range)
+    const severity = LocationListSeverity[DiagnosticSeverity[diagnostic.severity]]
+
+    # Get byte index and not a number for column
+    const bytecol = virtcol2col(0, lnum, col)
+
+    if bytecol > 0
+      prop_add(lnum, bytecol, {
         bufnr: buf,
-        end_col: item.end_col,
-        type: printf('LSPClientDiagnosticPropText%s', LocationListSeverity[item.type]),
+        end_col: end_col,
+        type: printf('LSPClientDiagnosticPropText%s', severity),
       })
     endif
   endfor
@@ -93,33 +146,12 @@ export def HandleRequest(request: any, lspClientConfig: dict<any>): void
   const buf = bufnr(filename)
   const diagnostics = params->get('diagnostics', [])
 
-  # Reset
-  var loclist = []
+  # Re-render Location List
+  RenderBufLocationList(buf, diagnostics, lspClientConfig)
 
-  if diagnostics->empty()
-    bufferLocationList[buf] = []
-  else
-    bufferLocationList[buf] = CreateLocList(diagnostics, buf, lspClientConfig)
-  endif
+  # Re-render signs
+  RenderBufSigns(buf, diagnostics)
 
-  # Merge for every buffer and then set
-  for b in bufferLocationList->keys()
-    loclist = loclist->extendnew(bufferLocationList[b])
-  endfor
-
-  setloclist(0, [], 'r')
-  setloclist(0, [], 'a', {
-    title: 'LSPClient Diagnostics',
-    items: loclist,
-    quickfixtextfunc: LocListTextFunc,
-  })
-
-  # Re-render signs for generated diagnostics
-  sign.UnplaceBuffer(buf)
-  const signs = CreateSigns(diagnostics, buf)
-  sign.PlaceList(signs)
-
-  # Re-render prop text for generated diagnostics
-  ClearBufTextProps(buf)
-  RenderBufTextProps(buf, loclist)
+  # Re-render text props
+  RenderBufTextProps(buf, diagnostics)
 enddef
