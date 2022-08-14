@@ -38,8 +38,10 @@ def OnResponse(ch: channel, response: any): void
   if result->type() == v:t_dict
     const filepath = RelativeFilepath(fs.UriToFile(result.uri))
     const lnum = result.range.start.line + 1
+    const virtcol = location.range.start.character + 1
+    const col = virtcol2col(0, lnum, virtcol)
 
-    execute printf("edit +%d %s", lnum, filepath)
+    execute printf("edit +call\\ cursor(%d,\\ %d) %s", lnum, col, filepath)
 
     return
   endif
@@ -55,11 +57,12 @@ def OnResponse(ch: channel, response: any): void
         GoToLocation(location)
       endif
 
-
       const filepath = RelativeFilepath(fs.UriToFile(location.uri))
       const lnum = location.range.start.line + 1
+      const virtcol = location.range.start.character + 1
+      const col = virtcol2col(0, lnum, virtcol)
 
-      execute printf("edit +%d %s", lnum, filepath)
+      execute printf("edit +call\\ cursor(%d,\\ %d) %s", lnum, col, filepath)
     else
       # WIP
       # Show a list of possible files with the same definition
