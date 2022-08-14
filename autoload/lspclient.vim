@@ -100,6 +100,10 @@ def RequestForEachClient(Callback: func): void
   endif
 
   for clientId in registeredClients
+    if !IsChannelConnected(GetChannel(clientId))
+      continue
+    endif
+
     if IsAttachedToBuffers(clientId, buf)
       Callback(GetChannel(clientId), buf)
     endif
