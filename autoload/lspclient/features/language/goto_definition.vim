@@ -14,16 +14,18 @@ enddef
 def GoToLocation(location: dict<any>): void
   const filepath = RelativeFilepath(fs.UriToFile(location.uri))
   const lnum = location.range.start.line + 1
+  const col = location.range.start.character + 1
 
-  execute printf("edit +%d %s", lnum, filepath)
+  execute printf("edit +call\\ setcursorcharpos(%d,\\ %d) %s", lnum, col, filepath)
 enddef
 
 # Handle LocationLink type result
 def GoToLocationLink(location: dict<any>): void
   const filepath = RelativeFilepath(fs.UriToFile(location.targetUri))
   const lnum = location.targetRange.start.line + 1
+  const col = location.targetRange.start.character + 1
 
-  execute printf("edit +%d %s", lnum, filepath)
+  execute printf("edit +call\\ setcursorcharpos(%d,\\ %d) %s", lnum, col, filepath)
 enddef
 
 def OnResponse(ch: channel, response: any): void
@@ -38,10 +40,9 @@ def OnResponse(ch: channel, response: any): void
   if result->type() == v:t_dict
     const filepath = RelativeFilepath(fs.UriToFile(result.uri))
     const lnum = result.range.start.line + 1
-    const virtcol = location.range.start.character + 1
-    const col = virtcol2col(0, lnum, virtcol)
+    const col = result.range.start.character + 1
 
-    execute printf("edit +call\\ cursor(%d,\\ %d) %s", lnum, col, filepath)
+    execute printf("edit +call\\ setcursorcharpos(%d,\\ %d) %s", lnum, col, filepath)
 
     return
   endif
@@ -56,36 +57,42 @@ def OnResponse(ch: channel, response: any): void
       else
         GoToLocation(location)
       endif
-
-      const filepath = RelativeFilepath(fs.UriToFile(location.uri))
-      const lnum = location.range.start.line + 1
-      const virtcol = location.range.start.character + 1
-      const col = virtcol2col(0, lnum, virtcol)
-
-      execute printf("edit +call\\ cursor(%d,\\ %d) %s", lnum, col, filepath)
     else
       # WIP
       # Show a list of possible files with the same definition
       # Preferebly in a quickfix list
       var qlist = []
 
-      for item in result
+      for location in result
         var qfItem = {}
+        var filename = ''
+        var lnum = -1
+        var virtcol = -1
+        var col = -1
 
         # Handle Location or LocationLink
-        if item->get('targetUri', '')->empty()
-          qfItem.filename = RelativeFilepath(fs.UriToFile(item.uri))
-          qfItem.lnum = item.range.start.line + 1
-          qfItem.col = item.range.start.character + 1
+        if location->get('targetUri', '')->empty()
+          filename = RelativeFilepath(fs.UriToFile(location.uri))
+          lnum = location.range.start.line + 1
+          virtcol = location.range.start.character + 1
+          col = virtcol2col(0, lnum, virtcol)
         else
-          qfItem.filename = RelativeFilepath(fs.UriToFile(item.targetUri))
-          qfItem.lnum = item.targetRange.start.line + 1
-          qfItem.col = item.targetRange.start.character + 1
+          filename = RelativeFilepath(fs.UriToFile(location.targetUri))
+          lnum = location.targetRange.start.line + 1
+          virtcol = location.targetRange.start.character + 1
+          col = virtcol2col(0, lnum, virtcol)
         endif
+
+        qfItem.filename = filename
+        qfItem.lnum = lnum
+        qfItem.vcol = 0
+        qfItem.col = col
+        qfItem.valid = true
 
         qlist->add(qfItem->extendnew({ valid: false }))
       endfor
 
+      # Show the qf list
       setqflist(qlist, 'r')
     endif
   endif
