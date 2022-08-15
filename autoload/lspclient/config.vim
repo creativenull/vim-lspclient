@@ -14,7 +14,6 @@ export def MergeLspClientConfig(partialLspClientConfig: dict<any>): dict<any>
   const defaults = {
     capabilities: null_dict,
     initOptions: null_dict,
-    markers: null_list,
     settings: null_dict,
   }
 
@@ -24,20 +23,29 @@ enddef
 export def ValidateLspClientConfig(lspClientConfig: dict<any>): string
   var errlist = []
 
-  if lspClientConfig->get('name', '') == ''
+  if !lspClientConfig->has_key('name')
     errlist->add('name')
   endif
 
-  if lspClientConfig->get('cmd', []) == []
+  if !lspClientConfig->has_key('cmd')
     errlist->add('cmd')
   endif
 
-  if lspClientConfig->get('filetypes', []) == []
+  if !lspClientConfig->has_key('filetypes')
     errlist->add('filetypes')
+  endif
+
+  if !lspClientConfig->has_key('markers')
+    errlist->add('markers')
   endif
 
   if !errlist->empty()
     return 'Missing arguments: ' .. errlist->join(',')
+  endif
+
+  # Also check if provided `cmd` is executable
+  if !lspClientConfig.cmd[0]->executable()
+    return '`cmd` is not executable. Check if ' .. lspClientConfig.cmd[0] .. ' if installed in the system.'
   endif
 
   return ''
