@@ -115,6 +115,7 @@ export def GotoDeclaration(): void
 enddef
 
 export def GotoDefinition(): void
+  popup.Loading()
   RequestForEachClient(goto_definition.Request)
 enddef
 
@@ -377,5 +378,11 @@ export def Create(partialLspClientConfig: dict<any>): void
 enddef
 
 export def Info(): void
-  logger.PrintInfo('Registered servers: ' .. lspClients->keys()->join(','))
+  const servers = lspClients->keys()
+
+  if servers->empty()
+    logger.PrintInfo('No servers registered.')
+  else
+    logger.PrintInfo('Registered servers: ' .. servers->join(','))
+  endif
 enddef
