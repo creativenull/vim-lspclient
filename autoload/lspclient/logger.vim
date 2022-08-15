@@ -32,13 +32,17 @@ def WriteLogFile(msg: string): void
 enddef
 
 # Generic format for messages to be logged as
-def Render(level: string, msg: string): string
+export def Render(level: string, msg: string): string
   return printf('%s: %s', level, msg)
 enddef
 
 # Logs to be printed to :messages
-export def Print(level: string, msg: string): void
-  echom printf('%s %s', messagesPrefix, Render(level, msg))
+export def Print(level: string, msg: string, isError = false): void
+  if isError
+    echoerr printf('%s %s', messagesPrefix, Render(level, msg))
+  else
+    echomsg printf('%s %s', messagesPrefix, Render(level, msg))
+  endif
 enddef
 
 # Log to be writted to logfiles
@@ -84,7 +88,7 @@ enddef
 export const Error = (msg: string): string => Render(Level.Error, msg)
 
 export def PrintError(msg: string): void
-  Print(Level.Error, msg)
+  Print(Level.Error, msg, true)
 enddef
 
 export def LogError(msg: string): void
