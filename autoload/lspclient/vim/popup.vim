@@ -7,6 +7,7 @@ const title = 'LSP Client'
 
 var isNotifyOpen = false
 var isPopupAtCursorOpen = false
+var isPopupLoading = false
 
 export const SeverityType = {
   E: 'Error',
@@ -15,12 +16,16 @@ export const SeverityType = {
   H: 'Hint',
 }
 
-def OnCloseNotify(popupId: any, result: any): void
+def OnCloseNotify(_popupId: any, _result: any): void
   isNotifyOpen = false
 enddef
 
-def OnClosePopupAtCursor(popupId: any, result: any): void
+def OnClosePopupAtCursor(_popupId: any, _result: any): void
   isPopupAtCursorOpen = false
+enddef
+
+def OnClosePopupLoading(_popupId: any, _result: any): void
+  isPopupLoading = false
 enddef
 
 export def DefineHighlights(): void
@@ -76,4 +81,41 @@ export def Cursor(message: any, level: string): void
     borderhighlight: [printf('LSPClientPopupBorder%s', level)],
     callback: OnClosePopupAtCursor,
   })
+enddef
+
+export def Loading(): void
+  var dots = [
+		"[ ●    ]",
+		"[  ●   ]",
+		"[   ●  ]",
+		"[    ● ]",
+		"[     ●]",
+		"[    ● ]",
+		"[   ●  ]",
+		"[  ●   ]",
+		"[ ●    ]",
+		"[●     ]"
+  ]
+  var currentDotPos = 0
+
+  const loadingWinId = popup_atcursor(dots[0], {
+    pos: 'topleft',
+    highlight: 'LSPClientPopup',
+    border: [],
+    padding: [0, 1, 0, 1],
+    borderchars: borderchars,
+    borderhighlight: ['LSPClientPopupBorder'],
+  })
+
+  def RenderLoader(timerId: number): void
+    currentDotPos += 1
+
+    if currentDotPos == dots->len()
+      currentDotPos = 0
+    endif
+
+    popup_settext(loadingWinId, dots[currentDotPos])
+  enddef
+
+  const loadingTimerId = timer_start(100, RenderLoader, { repeat: -1 })
 enddef
