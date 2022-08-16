@@ -48,11 +48,12 @@ def MakeBufLocationList(buf: number, diagnostics: list<any>, lspClientConfig: di
       bufnr: buf,
       text: LocationListText(message, source, severity, code),
       nr: code,
-      type: severity,
+      type: severity == 'H' ? 'I' : severity,
       lnum: lnum,
       col: col,
       end_lnum: end_lnum,
       end_col: end_col,
+      valid: true,
     }
   enddef
 
@@ -64,7 +65,15 @@ def LocationListTextFunc(info: dict<any>): list<string>
   const list = getloclist(info.winid)
   for item in list
     const filename = bufname(item.bufnr)
-    const text = printf('%s:%s:%s %s - %s', filename, item.lnum, item.col, LocationListSeverity[item.type], item.text)
+    const message = item.text->substitute("\n", '', 'g')
+    const text = printf(
+      '%s|%s:%s %s| %s',
+      filename,
+      item.lnum,
+      item.col,
+      LocationListSeverity[item.type]->tolower(),
+      message
+    )
 
     textFormats->add(text)
   endfor
@@ -73,6 +82,8 @@ def LocationListTextFunc(info: dict<any>): list<string>
 enddef
 
 def RenderBufLocationList(buf: number, diagnostics: list<any>, lspClientConfig: dict<any>): void
+  const winId = bufwinid(buf)
+
   # Reset
   var loclist = []
 
@@ -87,9 +98,9 @@ def RenderBufLocationList(buf: number, diagnostics: list<any>, lspClientConfig: 
     loclist = loclist->extendnew(bufferLocationList[b])
   endfor
 
-  setloclist(0, [], 'r')
-  setloclist(0, [], 'a', {
-    title: 'LSPClient Diagnostics',
+  setloclist(winId, [], 'r')
+  setloclist(winId, [], 'a', {
+    title: 'Diagnostics',
     items: loclist,
     quickfixtextfunc: LocationListTextFunc,
   })
