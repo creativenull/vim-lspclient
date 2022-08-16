@@ -16,8 +16,6 @@ Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-proto
 + Server Shutdown (`shutdown` and `exit`)
 + Dynamic Registration Capability
     + `workspace/didChangeConfiguration`
-    + `textDocument/declaration`
-    + `textDocument/definition`
 + Document updates
     + `textDocument/didOpen`
     + `textDocument/didChange`
@@ -26,8 +24,10 @@ Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-proto
     + `textDocument/didSave`
 + Language features
     + `textDocument/publishDiagnostics`
-    + `textDocument/declaration` (WIP)
-    + `textDocument/definition` (WIP)
+    + `textDocument/declaration`
+    + `textDocument/definition`
+    + `textDocument/typeDefinition`
+    + `textDocument/implementation`
 +  Workspace features 
     + `workspace/configuration`
     + `workspace/didChangeConfiguration`
