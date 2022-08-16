@@ -3,6 +3,8 @@ vim9script
 import './core/protocol.vim'
 import './features/language/goto_declaration.vim'
 import './features/language/goto_definition.vim'
+import './features/language/goto_implementation.vim'
+import './features/language/goto_type_definition.vim'
 import './features/language/publish_diagnostics.vim'
 import './features/window/message.vim'
 import './features/window/work_done.vim'
@@ -44,6 +46,14 @@ export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<
 
       if registration.method == 'textDocument/definition'
         goto_definition.Register(ch, registration, lspClientConfig)
+      endif
+
+      if registration.method == 'textDocument/typeDefinition'
+        goto_type_definition.Register(ch, registration, lspClientConfig)
+      endif
+
+      if registration.method == 'textDocument/implementation'
+        goto_implementation.Register(ch, registration, lspClientConfig)
       endif
     endfor
   endif
