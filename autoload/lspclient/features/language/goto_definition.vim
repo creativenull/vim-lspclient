@@ -4,6 +4,9 @@ import '../../core/protocol.vim'
 import '../../fs.vim'
 import '../../logger.vim'
 import '../../random.vim'
+import '../../vim/popup.vim'
+
+var popupLoadingRef = {}
 
 # Get the file path relative to the project root
 def RelativeFilepath(filepath: string): string
@@ -29,7 +32,14 @@ def GoToLocationLink(location: dict<any>): void
 enddef
 
 def OnResponse(ch: channel, response: any): void
-  logger.LogDebug('Response `textDocument/definition`: ' .. response->string())
+  logger.LogDebug('Got Response `textDocument/definition`: ' .. response->string())
+
+  # Clear loading window
+  if !popupLoadingRef->empty()
+    popup.LoadingStop(popupLoadingRef)
+  endif
+
+  # Process results
   const result = response->get('result', {})
 
   if result->empty()
@@ -103,7 +113,8 @@ def MakeRequest(ch: channel, params: dict<any>): void
   logger.LogDebug('Request `textDocument/definition`: ' .. params->string())
 enddef
 
-export def Request(ch: channel, buf: number): void
+export def Request(ch: channel, buf: number, context: dict<any>): void
+  popupLoadingRef = context->get('popupLoadingRef', {})
   const winId = bufwinid(buf)
   const curpos = getcurpos(winId)
   const line = curpos[1]
