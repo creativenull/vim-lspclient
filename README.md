@@ -97,6 +97,7 @@ let s:tsserver.name = 'tsserver'
 let s:tsserver.cmd = ['typescript-language-server', '--stdio']
 let s:tsserver.filetypes = ['typescript', 'typescriptreact', 'javascript', 'javascriptreact']
 let s:tsserver.initOptions = { 'hostInfo': 'Vim 9' }
+let s:tsserver.markers = ['tsconfig.json', 'jsconfig.json', 'package.json']
 
 call lspclient#Create(s:tsserver)
 ```
@@ -110,6 +111,7 @@ let s:volar = {}
 let s:volar.name = 'volar'
 let s:volar.cmd = ['vue-language-server', '--stdio']
 let s:volar.filetypes = ['vue']
+let s:volar.markers = ['package.json', 'vite.config.js', 'vite.config.ts']
 
 " https://github.com/johnsoncodehk/volar/blob/d27d989355adc2aa3f9c6260226bd3167e3fac97/packages/shared/src/types.ts
 let s:volar.initOptions = {
@@ -166,6 +168,7 @@ let s:denols.name = 'denols'
 let s:denols.cmd = ['deno', 'lsp']
 let s:denols.filetypes = ['typescript', 'typescriptreact', 'javascript', 'javascriptreact']
 let s:denols.settings = { 'enable': v:true, 'unstable': v:true }
+let s:denols.markers = ['deno.json', 'deno.jsonc']
 
 call lspclient#Create(s:denols)
 ```
