@@ -8,6 +8,8 @@ import './lspclient/router.vim'
 import './lspclient/config.vim'
 import './lspclient/features/language/goto_declaration.vim'
 import './lspclient/features/language/goto_definition.vim'
+import './lspclient/features/language/goto_type_definition.vim'
+import './lspclient/features/language/goto_implementation.vim'
 import './lspclient/vim/popup.vim'
 
 # Events
@@ -91,7 +93,7 @@ enddef
 # ---
 
 # Make a callback for every client attached to a buffer
-def RequestForEachClient(Callback: func): void
+def RequestForEachClient(Callback: func, serverCapability: string): void
   const buf = bufnr()
   const registeredClients = lspClients->keys()
 
@@ -106,6 +108,17 @@ def RequestForEachClient(Callback: func): void
       continue
     endif
 
+    const capabilityProvider = GetServerCapabilities(clientId)->get(serverCapability)
+    if capabilityProvider->type() == v:t_number
+      const [_, startIdx, _] = serverCapability->matchstrpos('Provider')
+      const providerName = serverCapability[0 : startIdx - 1]
+      const clientName = GetConfig(clientId).name
+
+      popup.LoadingStop(popupLoadingRef)
+      popup.Notify(printf('%s has no capability for `%s`', clientName, providerName), popup.SeverityType.I)
+      continue
+    endif
+
     if IsAttachedToBuffers(clientId, buf)
       Callback(GetChannel(clientId), buf, { popupLoadingRef: popupLoadingRef })
     endif
@@ -113,11 +126,19 @@ def RequestForEachClient(Callback: func): void
 enddef
 
 export def GotoDeclaration(): void
-  RequestForEachClient(goto_declaration.Request)
+  RequestForEachClient(goto_declaration.Request, 'declarationProvider')
 enddef
 
 export def GotoDefinition(): void
-  RequestForEachClient(goto_definition.Request)
+  RequestForEachClient(goto_definition.Request, 'definitionProvider')
+enddef
+
+export def GotoTypeDefinition(): void
+  RequestForEachClient(goto_type_definition.Request, 'typeDefinitionProvider')
+enddef
+
+export def GotoImplementation(): void
+  RequestForEachClient(goto_implementation.Request, 'implementationProvider')
 enddef
 
 export def DiagnosticPopupAtCursor(): void
