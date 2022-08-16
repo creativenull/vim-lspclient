@@ -83,7 +83,7 @@ export def Cursor(message: any, level: string): void
   })
 enddef
 
-export def Loading(): void
+export def LoadingStart(): dict<any>
   var dots = [
 		"[ ●    ]",
 		"[  ●   ]",
@@ -118,4 +118,14 @@ export def Loading(): void
   enddef
 
   const loadingTimerId = timer_start(100, RenderLoader, { repeat: -1 })
+
+  return {
+    winid: loadingWinId,
+    timer: loadingTimerId,
+  }
+enddef
+
+export def LoadingStop(loadingRef: dict<any>): void
+  popup_close(loadingRef.winid)
+  timer_stop(loadingRef.timer)
 enddef
