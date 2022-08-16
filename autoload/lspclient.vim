@@ -99,13 +99,15 @@ def RequestForEachClient(Callback: func): void
     return
   endif
 
+  const popupLoadingRef = popup.LoadingStart()
+
   for clientId in registeredClients
     if !IsChannelConnected(GetChannel(clientId))
       continue
     endif
 
     if IsAttachedToBuffers(clientId, buf)
-      Callback(GetChannel(clientId), buf)
+      Callback(GetChannel(clientId), buf, { popupLoadingRef: popupLoadingRef })
     endif
   endfor
 enddef
@@ -115,11 +117,10 @@ export def GotoDeclaration(): void
 enddef
 
 export def GotoDefinition(): void
-  popup.Loading()
   RequestForEachClient(goto_definition.Request)
 enddef
 
-export def PopupDiagnosticAtCursor(): void
+export def DiagnosticPopupAtCursor(): void
   const [_, curlnum, curcol, _, _] = getcurpos()
   const buf = bufnr('%')
   const loclist = getloclist(0)
@@ -133,6 +134,34 @@ export def PopupDiagnosticAtCursor(): void
       endif
     endfor
   endif
+enddef
+
+export def Diagnostics(): void
+  const buf = bufnr()
+  const winid = bufwinid(buf)
+  const listSize = getloclist(winid)->len()
+
+  execute printf('lopen %d', listSize > 10 ? 10 : listSize)
+enddef
+
+# TODO: ensure :lnext doesn't print to :messages
+export def DiagnosticNext(): void
+  try
+    lnext
+    # lspclient.DiagnosticPopupAtCursor()
+  catch
+    lfirst
+  endtry
+enddef
+
+# TODO: ensure :lprev doesn't print to :messages
+export def DiagnosticPrev(): void
+  try
+    lprev
+    # lspclient.DiagnosticPopupAtCursor()
+  catch
+    llast
+  endtry
 enddef
 
 # Buffer/Document sync

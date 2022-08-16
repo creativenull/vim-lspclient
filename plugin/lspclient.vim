@@ -28,11 +28,17 @@ nmap <unique> <silent> <Plug>(lspclient_definition) <ScriptCmd>lspclient.GotoDef
 command! LSPClientGotoDeclaration call lspclient.GotoDeclaration()
 nmap <unique> <silent> <Plug>(lspclient_declaration) <ScriptCmd>lspclient.GotoDeclaration()<CR>
 
-command! LSPClientDiagnostics lopen
-nmap <unique> <silent> <Plug>(lspclient_diagnostics) <Cmd>lopen<CR>
+command! LSPClientDiagnostics call lspclient.Diagnostics()
+nmap <unique> <silent> <Plug>(lspclient_diagnostics) <ScriptCmd>lspclient.Diagnostics()<CR>
 
-command! LSPClientDiagnosticHover call lspclient.PopupDiagnosticAtCursor()
-nmap <unique> <silent> <Plug>(lspclient_diagnostic_hover) <ScriptCmd>lspclient.PopupDiagnosticAtCursor()<CR>
+command! LSPClientDiagnosticNext call lspclient.DiagnosticNext()
+nmap <unique> <silent> <Plug>(lspclient_diagnostic_next) <ScriptCmd>lspclient.DiagnosticNext()<CR>
+
+command! LSPClientDiagnosticPrev call lspclient.DiagnosticNext()
+nmap <unique> <silent> <Plug>(lspclient_diagnostic_prev) <ScriptCmd>lspclient.DiagnosticPrev()<CR>
+
+command! LSPClientDiagnosticHover call lspclient.DiagnosticPopupAtCursor()
+nmap <unique> <silent> <Plug>(lspclient_diagnostic_hover) <ScriptCmd>lspclient.DiagnosticPopupAtCursor()<CR>
 
 # Popup Highlights
 popup.DefineHighlights()
