@@ -28,6 +28,12 @@ nmap <unique> <silent> <Plug>(lspclient_definition) <ScriptCmd>lspclient.GotoDef
 command! LSPClientGotoDeclaration call lspclient.GotoDeclaration()
 nmap <unique> <silent> <Plug>(lspclient_declaration) <ScriptCmd>lspclient.GotoDeclaration()<CR>
 
+command! LSPClientGotoTypeDefinition call lspclient.GotoTypeDefinition()
+nmap <unique> <silent> <Plug>(lspclient_type_definition) <ScriptCmd>lspclient.GotoTypeDefinition()<CR>
+
+command! LSPClientGotoImplementation call lspclient.GotoImplementation()
+nmap <unique> <silent> <Plug>(lspclient_implementation) <ScriptCmd>lspclient.GotoImplementation()<CR>
+
 command! LSPClientDiagnostics call lspclient.Diagnostics()
 nmap <unique> <silent> <Plug>(lspclient_diagnostics) <ScriptCmd>lspclient.Diagnostics()<CR>
 
