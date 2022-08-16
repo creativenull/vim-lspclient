@@ -162,6 +162,10 @@ export def Diagnostics(): void
   const winid = bufwinid(buf)
   const listSize = getloclist(winid)->len()
 
+  if listSize == 0
+    return
+  endif
+
   execute printf('lopen %d', listSize > 10 ? 10 : listSize)
 enddef
 
