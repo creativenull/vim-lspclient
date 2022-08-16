@@ -5,12 +5,32 @@ vim9script
 # Buffer/File contents
 # Directory resolution
 
+export def DecodeUri(encodedUri: string): string
+  def HexToChar(matched: list<string>): string
+    const hexCode = '0x' .. matched[1]
+    return hexCode->str2nr(16)->nr2char()
+  enddef
+
+  return encodedUri->substitute('%\(\x\x\)', HexToChar, 'g')
+enddef
+
+export def EncodeUri(decodedUri: string): string
+  def CharToHex(matched: list<string>): string
+    const hexStr = printf('%%%x', matched[1]->char2nr())
+    return hexStr
+  enddef
+
+  return decodedUri->substitute('\([^A-Za-z0-9-._~:/]\)', CharToHex, 'g')
+enddef
+
 export def FileToUri(filepath: string): string
-  return printf('file://%s', filepath)
+  const uri = printf('file://%s', filepath)
+  return EncodeUri(uri)
 enddef
 
 export def UriToFile(uri: string): string
-  return uri[7 :]
+  const decodedUri = DecodeUri(uri)
+  return decodedUri[7 :]
 enddef
 
 # Fullpath of buffer file to uri
