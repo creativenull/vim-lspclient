@@ -68,3 +68,16 @@ enddef
 export def GetBufferContents(buf: number): string
   return buf->getbufline(1, '$')->join("\n")
 enddef
+
+export def HasRootMarker(markers: list<string>): bool
+  const cwd = getcwd()
+  const markerPaths = markers->mapnew((_idx, marker) => printf('%s/%s', cwd, marker))
+
+  for path in markerPaths
+    if path->filereadable()
+      return true
+    endif
+  endfor
+
+  return false
+enddef

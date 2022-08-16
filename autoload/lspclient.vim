@@ -295,6 +295,10 @@ export def LspStartServer(id: string): void
     return
   endif
 
+  if !fs.HasRootMarker(GetConfig(id).markers)
+    return
+  endif
+
   # Notify the server that the client has initialized once
   # the response provides no errors
   def OnInitialize(ch: channel, response: dict<any>): void
