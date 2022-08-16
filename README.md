@@ -63,7 +63,31 @@ git clone https://github.com/creativenull/vim-lspclient.git ~/.vim/pack/creative
 
 ## Setup
 
-### tsserver (js/ts)
+### Keymaps
+
+```vim
+" Example keymaps
+nmap <Leader>lgd <Plug>(lspclient_definition)
+nmap <Leader>lge <Plug>(lspclient_declaration)
+nmap <Leader>lgi <Plug>(lspclient_implementation)
+nmap <Leader>lgt <Plug>(lspclient_type_definition)
+nmap <Leader>le <Plug>(lspclient_diagnostics)
+nmap <Leader>lo <Plug>(lspclient_diagnostic_next)
+nmap <Leader>li <Plug>(lspclient_diagnostic_prev)
+nmap <Leader>lw <Plug>(lspclient_diagnostic_hover)
+```
+
+### Enable Debug Logs
+
+Check logs with `:LSPClientLog` or `vim +LSPClientLog` (in terminal)
+
+```vim
+let g:lspclient_debug = 1
+```
+
+### LSP Servers Setup Examples
+
+#### tsserver (js/ts)
 
 Must have `typescript-language-server` installed globally with `npm i -g typescript-language-server`.
 
@@ -77,7 +101,7 @@ let s:tsserver.initOptions = { 'hostInfo': 'Vim 9' }
 call lspclient#Create(s:tsserver)
 ```
 
-### volar (vue >= 3)
+#### volar (vue >= 3)
 
 Must have `vue-language-server` installed globally with `npm i -g @volar/vue-language-server`
 
@@ -132,7 +156,7 @@ let s:volar.initOptions = {
 call lspclient#Create(s:volar)
 ```
 
-### deno (js/ts)
+#### deno (js/ts)
 
 Must have `deno` installed globally.
 
