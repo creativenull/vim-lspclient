@@ -67,7 +67,7 @@ def LocationListTextFunc(info: dict<any>): list<string>
     const filename = bufname(item.bufnr)
     const message = item.text->substitute("\n", '', 'g')
     const text = printf(
-      '%s|%s:%s %s| %s',
+      '%s | %s:%s %s | %s',
       filename,
       item.lnum,
       item.col,
