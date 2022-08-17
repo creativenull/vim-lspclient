@@ -10,6 +10,8 @@ import './lspclient/features/language/goto_declaration.vim'
 import './lspclient/features/language/goto_definition.vim'
 import './lspclient/features/language/goto_type_definition.vim'
 import './lspclient/features/language/goto_implementation.vim'
+import './lspclient/features/language/references.vim'
+import './lspclient/features/language/document_highlight.vim'
 import './lspclient/vim/popup.vim'
 
 # Events
@@ -139,6 +141,14 @@ enddef
 
 export def GotoImplementation(): void
   RequestForEachClient(goto_implementation.Request, 'implementationProvider')
+enddef
+
+export def FindReferences(): void
+  RequestForEachClient(references.Request, 'referencesProvider')
+enddef
+
+export def DocumentHighlight(): void
+  RequestForEachClient(document_highlight.Request, 'documentHighlightProvider')
 enddef
 
 export def DiagnosticPopupAtCursor(): void
