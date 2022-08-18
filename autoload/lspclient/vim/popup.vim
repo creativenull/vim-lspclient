@@ -16,6 +16,14 @@ export const SeverityType = {
   H: 'Hint',
 }
 
+export const Level = {
+  Error: 'Error',
+  Warning: 'Warning',
+  Hint: 'Hint',
+  Info: 'Info',
+  Hover: 'Hover',
+}
+
 def OnCloseNotify(_popupId: any, _result: any): void
   isNotifyOpen = false
 enddef
@@ -35,6 +43,7 @@ export def DefineHighlights(): void
     { name: 'LSPClientPopupBorderWarning', guifg: colors.Warning, guibg: 'NONE' },
     { name: 'LSPClientPopupBorderHint', guifg: colors.Hint, guibg: 'NONE' },
     { name: 'LSPClientPopupBorderInfo', guifg: colors.Info, guibg: 'NONE' },
+    { name: 'LSPClientPopupBorderHover', guifg: colors.Hover, guibg: 'NONE' },
     { name: 'LSPClientPopup', guifg: colors.Text, guibg: 'NONE' },
     { name: 'LSPClientPopupError', guifg: colors.Error, guibg: 'NONE' },
     { name: 'LSPClientPopupWarning', guifg: colors.Warning, guibg: 'NONE' },
@@ -63,13 +72,12 @@ export def Notify(message: any, level: string): void
   })
 enddef
 
-export def Cursor(message: any, level: string): void
+export def Cursor(message: any, level: string, opts = {}): void
   if isPopupAtCursorOpen
     return
   endif
 
-  isPopupAtCursorOpen = true
-  message->popup_atcursor({
+  const defaults = {
     title: level,
     pos: 'topleft',
     minwidth: 80,
@@ -80,7 +88,10 @@ export def Cursor(message: any, level: string): void
     borderchars: borderchars,
     borderhighlight: [printf('LSPClientPopupBorder%s', level)],
     callback: OnClosePopupAtCursor,
-  })
+  }
+
+  isPopupAtCursorOpen = true
+  message->popup_atcursor(defaults->extendnew(opts))
 enddef
 
 export def LoadingStart(): dict<any>

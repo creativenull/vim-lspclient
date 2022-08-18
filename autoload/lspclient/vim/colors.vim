@@ -9,6 +9,8 @@ const violet400 = '#a78bfa'
 const violet600 = '#7c3aed'
 const gray100 = '#f3f4f6'
 const gray200 = '#e5e7eb'
+const gray400 = '#9ca3af'
+const gray600 = '#4b5563'
 
 # Severity colors
 export const Error = rose600
@@ -16,3 +18,4 @@ export const Warning = orange600
 export const Hint = violet400
 export const Info = cyan500
 export const Text = gray100
+export const Hover = gray600
