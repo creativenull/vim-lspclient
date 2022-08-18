@@ -38,7 +38,7 @@ export def Make(partialCapabilities = null_dict): dict<any>
       references: { dynamicRegistration: true },
       documentHighlight: { dynamicRegistration: true },
       hover: {
-        dynamicRegistration: false,
+        dynamicRegistration: true,
         contentFormat: 'markdown',
       },
       publishDiagnostics: {
