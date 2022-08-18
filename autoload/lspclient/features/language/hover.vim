@@ -36,7 +36,6 @@ def OnResponse(ch: channel, response: any): void
         if item.value->match("\n") != -1
           const values = item.value->split("\n")
           for val in values
-            logger.PrintDebug(val)
             popupContents->add(val)
           endfor
 
@@ -51,7 +50,6 @@ def OnResponse(ch: channel, response: any): void
           if item->match("\n") != -1
             const values = item->split("\n")
             for val in values
-              logger.PrintDebug(val)
               popupContents->add(val)
             endfor
 
