@@ -46,6 +46,9 @@ nmap <unique> <silent> <Plug>(lspclient_diagnostic_prev) <ScriptCmd>lspclient.Di
 command! LSPClientDiagnosticHover call lspclient.DiagnosticPopupAtCursor()
 nmap <unique> <silent> <Plug>(lspclient_diagnostic_hover) <ScriptCmd>lspclient.DiagnosticPopupAtCursor()<CR>
 
+command! LSPClientHover call lspclient.Hover()
+nmap <unique> <silent> <Plug>(lspclient_hover) <ScriptCmd>lspclient.Hover()<CR>
+
 # Popup Highlights
 popup.DefineHighlights()
 

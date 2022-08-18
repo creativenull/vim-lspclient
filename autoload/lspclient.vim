@@ -12,6 +12,7 @@ import './lspclient/features/language/goto_type_definition.vim'
 import './lspclient/features/language/goto_implementation.vim'
 import './lspclient/features/language/references.vim'
 import './lspclient/features/language/document_highlight.vim'
+import './lspclient/features/language/hover.vim'
 import './lspclient/vim/popup.vim'
 
 # Events
@@ -149,6 +150,10 @@ enddef
 
 export def DocumentHighlight(): void
   RequestForEachClient(document_highlight.Request, 'documentHighlightProvider')
+enddef
+
+export def Hover(): void
+  RequestForEachClient(hover.Request, 'hoverProvider')
 enddef
 
 export def DiagnosticPopupAtCursor(): void
