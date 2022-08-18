@@ -4,10 +4,11 @@ import '../../core/protocol.vim'
 import '../../fs.vim'
 import '../../logger.vim'
 import '../../random.vim'
+import '../../vim/popup.vim'
 
 const method = 'textDocument/documentHighlight'
 
-var popupLoadingRef = null
+var popupLoadingRef = {}
 
 def OnResponse(ch: channel, response: any): void
   logger.LogDebug(printf('Got Response `%s`: %s', method, response->string()))
@@ -21,7 +22,7 @@ enddef
 export def Request(ch: channel, buf: number, context: dict<any>): void
   popupLoadingRef = context->get('popupLoadingRef', {})
   const winId = bufwinid(buf)
-  const [_, line, col, _] = getcurpos(winId)
+  const [_, line, col, _, _] = getcurpos(winId)
   const params = {
     textDocument: { uri: fs.BufferToUri(buf) },
     position: {
