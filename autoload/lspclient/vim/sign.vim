@@ -3,9 +3,8 @@ vim9script
 import '../logger.vim'
 import './colors.vim'
 
-var placed = []
+export const Group = 'LSPClient'
 
-export const namespace = 'LSPClient'
 export const SeverityType = {
   E: 'Error',
   W: 'Warning',
@@ -60,39 +59,4 @@ export def DefineSigns(): void
   if !success
     logger.PrintError('Failed to define signs')
   endif
-enddef
-
-export def Place(level: string, buf: number, lnum: number): number
-  const sign = printf('LSPClientSign%s', level)
-  const id = sign_place(0, namespace, sign, buf, {
-    lnum: lnum,
-    priority: 100,
-  })
-
-  # Track placed signs
-  placed->add(id)
-
-  return id
-enddef
-
-export def PlaceList(signs: list<dict<any>>): void
-  for sign in signs
-    Place(sign.level, sign.buf, sign.lnum)
-  endfor
-enddef
-
-export def Unplace(id: number): void
-  sign_unplace(namespace, { id: id })
-enddef
-
-export def UnplaceBuffer(buf: number): void
-  if !buf->bufexists()
-    return
-  endif
-
-  sign_unplace(namespace, { buffer: buf })
-enddef
-
-export def UnplaceAll(): void
-  sign_unplace(namespace)
 enddef
