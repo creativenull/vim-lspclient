@@ -8,7 +8,20 @@ import '../../vim/sign.vim'
 # Track by each buffer
 var bufferLocationList = {}
 
+var publishedDiagnostics = {
+  qf: {},
+  signs: {},
+  textprops: {},
+}
+
 const LocationListSeverity = {
+  'E': 'Error',
+  'W': 'Warning',
+  'I': 'Info',
+  'H': 'Hint',
+}
+
+const QfListSeverity = {
   'E': 'Error',
   'W': 'Warning',
   'I': 'Info',
@@ -32,137 +45,161 @@ def RangeOffset(range: dict<any>): list<number>
   return offsets
 enddef
 
-def LocationListText(message: string, source: string, severity: string, code: any): string
-  return printf('%s [%s %s%s]', message, source, severity, code)
-enddef
-
-def MakeBufLocationList(buf: number, diagnostics: list<any>, lspClientConfig: dict<any>): list<any>
-  def MapLocList(_i: number, diagnostic: dict<any>): dict<any>
-    const code = diagnostic->get('code') != 0 ? diagnostic.code : 0
+# Generate quickfix list from LSP diagnostics
+def MakeBufQfList(buf: number, diagnostics: list<any>, lspClientConfig: dict<any>): list<any>
+  def MakeQfText(diagnostic: dict<any>): string
     const source = diagnostic->get('source', lspClientConfig.name)
-    const message = diagnostic.message
-    const severity = DiagnosticSeverity[diagnostic.severity]
+
+    if diagnostic->has_key('code')
+      return printf('%s [%s %s]', diagnostic.message, source, diagnostic.code)
+    endif
+
+    return printf('%s [%s]', diagnostic.message, source)
+  enddef
+
+  def MapQfFunc(_i: number, diagnostic: dict<any>): dict<any>
     const [lnum, col, end_lnum, end_col] = RangeOffset(diagnostic.range)
 
-    return {
+    # Required
+    var qfItem = {
       bufnr: buf,
-      text: LocationListText(message, source, severity, code),
-      nr: code,
-      type: severity == 'H' ? 'I' : severity,
+      text: MakeQfText(diagnostic),
       lnum: lnum,
-      col: col,
       end_lnum: end_lnum,
+      col: col,
       end_col: end_col,
-      valid: true,
+      valid: 1,
+    }
+
+    # Optional
+    if diagnostic->has_key('code')
+      qfItem.nr = diagnostic.code
+    endif
+
+    if diagnostic->has_key('severity')
+      # Only takes E, W and I
+      const severity = DiagnosticSeverity[diagnostic.severity]
+      qfItem.type = severity == 'H' ? 'I' : severity
+    endif
+
+    return qfItem
+  enddef
+
+  return diagnostics->mapnew(MapQfFunc)
+enddef
+
+# Generate signs from LSP diagnostics
+def MakeBufSignList(buf: number, diagnostics: list<any>): list<any>
+  def MapSignFunc(_i: number, diagnostic: dict<any>): dict<any>
+    const [lnum, _, _, _] = RangeOffset(diagnostic.range)
+    var severity = 'I'
+
+    if diagnostic->has_key('severity')
+      severity = DiagnosticSeverity[diagnostic.severity]
+    endif
+
+    return {
+      buffer: buf,
+      lnum: lnum,
+      group: 'LSPClient',
+      name: printf('LSPClientSign%s', QfListSeverity[severity]),
+      priority: 100,
     }
   enddef
 
-  return diagnostics->mapnew(MapLocList)
+  return diagnostics->mapnew(MapSignFunc)
 enddef
 
-def LocationListTextFunc(info: dict<any>): list<string>
-  var textFormats = []
-  const list = getloclist(info.winid)
-  for item in list
-    const filename = bufname(item.bufnr)
-    const message = item.text->substitute("\n", '', 'g')
-    const text = printf(
-      '%s | %s:%s %s | %s',
-      filename,
-      item.lnum,
-      item.col,
-      LocationListSeverity[item.type]->tolower(),
-      message
-    )
+# Generate textprops to hightlight text from LSP diagnostics
+def MakeBufTextProps(buf: number, diagnostics: list<any>): dict<any>
+  var errorTextProps = []
+  var warningTextProps = []
+  var hintTextProps = []
+  var infoTextProps = []
 
-    textFormats->add(text)
+  for diagnostic in diagnostics
+    const [lnum, col, end_lnum, end_col] = RangeOffset(diagnostic.range)
+
+    if !diagnostic->has_key('severity')
+      # By default, diagnostic will be error
+      errorTextProps->add([lnum, col, end_lnum, end_col])
+      continue
+    endif
+
+    if DiagnosticSeverity[diagnostic.severity] == 'E'
+      errorTextProps->add([lnum, col, end_lnum, end_col])
+    elseif DiagnosticSeverity[diagnostic.severity] == 'W'
+      warningTextProps->add([lnum, col, end_lnum, end_col])
+    elseif DiagnosticSeverity[diagnostic.severity] == 'H'
+      hintTextProps->add([lnum, col, end_lnum, end_col])
+    elseif DiagnosticSeverity[diagnostic.severity] == 'I'
+      infoTextProps->add([lnum, col, end_lnum, end_col])
+    endif
   endfor
 
-  return textFormats
+  return {
+    LSPClientDiagnosticPropTextError: errorTextProps,
+    LSPClientDiagnosticPropTextWarning: warningTextProps,
+    LSPClientDiagnosticPropTextHint: hintTextProps,
+    LSPClientDiagnosticPropTextInfo: infoTextProps,
+  }
 enddef
 
-def RenderBufLocationList(buf: number, diagnostics: list<any>, lspClientConfig: dict<any>): void
-  const winId = bufwinid(buf)
-
-  # Reset
-  var loclist = []
+# Handle diagnostics to show to user
+export def HandleRequest(request: any, lspClientConfig: dict<any>): void
+  const buf = bufnr(fs.UriToFile(request.params.uri))
+  const diagnostics = request.params->get('diagnostics', [])
 
   if diagnostics->empty()
-    bufferLocationList[buf] = []
-  else
-    bufferLocationList[buf] = MakeBufLocationList(buf, diagnostics, lspClientConfig)
+    publishedDiagnostics.qf[buf] = []
+    publishedDiagnostics.signs[buf] = []
+    publishedDiagnostics.textprops[buf] = []
   endif
 
-  # Merge for every buffer and then set
-  for b in bufferLocationList->keys()
-    loclist = loclist->extendnew(bufferLocationList[b])
+  # Quickfix
+  publishedDiagnostics.qf[buf] = MakeBufQfList(buf, diagnostics, lspClientConfig)
+
+  var qflist = []
+  for b in publishedDiagnostics.qf->keys()
+    qflist = qflist->extendnew(publishedDiagnostics.qf[b])
   endfor
 
-  setloclist(winId, [], 'r')
-  setloclist(winId, [], 'a', {
+  # setqflist(qflist, 'r')
+  setqflist([], 'r')
+  setqflist([], 'a', {
     title: 'Diagnostics',
-    items: loclist,
-    quickfixtextfunc: LocationListTextFunc,
+    items: qflist,
   })
-enddef
 
-def ClearBufSigns(buf: number): void
-  sign.UnplaceBuffer(buf)
-enddef
+  # Signs
+  # Clear placed signs first
+  sign_unplace('LSPClient', { buffer: buf })
 
-def RenderBufSigns(buf: number, diagnostics: list<any>): void
-  ClearBufSigns(buf)
+  publishedDiagnostics.signs[buf] = MakeBufSignList(buf, diagnostics)
 
-  const signs = diagnostics->mapnew((_i, diagnostic) => ({
-    buf: buf,
-    lnum: diagnostic.range.start.line + 1,
-    level: SignSeverity[DiagnosticSeverity[diagnostic.severity]],
-  }))
+  var signList = []
+  for b in publishedDiagnostics.signs->keys()
+    signList = signList->extendnew(publishedDiagnostics.signs[b])
+  endfor
 
-  sign.PlaceList(signs)
-enddef
+  sign_placelist(signList)
 
-def ClearBufTextProps(buf: number): void
+  # Textprops
+  # clear first then assign the highlight
   prop_remove({ type: 'LSPClientDiagnosticPropTextError', bufnr: buf })
   prop_remove({ type: 'LSPClientDiagnosticPropTextWarning', bufnr: buf })
   prop_remove({ type: 'LSPClientDiagnosticPropTextHint', bufnr: buf })
   prop_remove({ type: 'LSPClientDiagnosticPropTextInfo', bufnr: buf })
-enddef
 
-def RenderBufTextProps(buf: number, diagnostics: list<any>): void
-  ClearBufTextProps(buf)
+  publishedDiagnostics.textprops[buf] = MakeBufTextProps(buf, diagnostics)
 
-  for diagnostic in diagnostics
-    const [lnum, col, _, end_col] = RangeOffset(diagnostic.range)
-    const severity = LocationListSeverity[DiagnosticSeverity[diagnostic.severity]]
-
-    # Get byte index and not a number for column
-    const bytecol = virtcol2col(0, lnum, col)
-
-    if bytecol > 0
-      prop_add(lnum, bytecol, {
-        bufnr: buf,
-        end_col: end_col,
-        type: printf('LSPClientDiagnosticPropText%s', severity),
-      })
-    endif
+  for b in publishedDiagnostics.textprops->keys()
+    for propType in publishedDiagnostics.textprops[b]->keys()
+      try
+        prop_add_list({ bufnr: buf, type: propType }, publishedDiagnostics.textprops[b][propType])
+      catch
+        continue
+      endtry
+    endfor
   endfor
-enddef
-
-# Handle diagnostics to a location list and signs.
-# Show on a per buffer basis
-export def HandleRequest(request: any, lspClientConfig: dict<any>): void
-  const params = request.params
-  const filename = fs.UriToFile(params.uri)
-  const buf = bufnr(filename)
-  const diagnostics = params->get('diagnostics', [])
-
-  # Re-render Location List
-  RenderBufLocationList(buf, diagnostics, lspClientConfig)
-
-  # Re-render signs
-  RenderBufSigns(buf, diagnostics)
-
-  # Re-render text props
-  RenderBufTextProps(buf, diagnostics)
 enddef
