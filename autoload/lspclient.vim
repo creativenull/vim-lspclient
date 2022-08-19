@@ -157,50 +157,51 @@ export def Hover(): void
 enddef
 
 export def DiagnosticPopupAtCursor(): void
-  const [_, curlnum, curcol, _, _] = getcurpos()
+  const [_, cursorLineNum, cursorCol, _, _] = getcurpos()
   const buf = bufnr('%')
-  const loclist = getloclist(0)
+  const qflist = getqflist()
 
-  if !loclist->empty()
-    for loc in loclist
-      if loc.bufnr == buf && loc.lnum == curlnum && (curcol >= loc.col && curcol <= loc.end_col)
-        const hasLines = loc.text->match("\n") != -1
-        const content = hasLines ? loc.text->split("\n") : loc.text
-        popup.Cursor(content, popup.SeverityType[loc.type])
-      endif
-    endfor
+  if qflist->empty()
+    return
   endif
+
+  for item in qflist
+    if item.bufnr == buf && item.lnum == cursorLineNum && (cursorCol >= item.col && cursorCol <= item.end_col)
+      const hasLines = item.text->match("\n") != -1
+      const content = hasLines ? item.text->split("\n") : item.text
+      popup.Cursor(content, popup.SeverityType[item.type])
+    endif
+  endfor
 enddef
 
 export def Diagnostics(): void
   const buf = bufnr()
-  const winid = bufwinid(buf)
-  const listSize = getloclist(winid)->len()
+  const listSize = getqflist()->len()
 
   if listSize == 0
     return
   endif
 
-  execute printf('lopen %d', listSize > 10 ? 10 : listSize)
+  execute printf('copen %d', listSize > 10 ? 10 : listSize)
 enddef
 
 # TODO: ensure :lnext doesn't print to :messages
 export def DiagnosticNext(): void
   try
-    lnext
+    cnext
     # lspclient.DiagnosticPopupAtCursor()
   catch
-    lfirst
+    cfirst
   endtry
 enddef
 
 # TODO: ensure :lprev doesn't print to :messages
 export def DiagnosticPrev(): void
   try
-    lprev
+    cprev
     # lspclient.DiagnosticPopupAtCursor()
   catch
-    llast
+    clast
   endtry
 enddef
 
