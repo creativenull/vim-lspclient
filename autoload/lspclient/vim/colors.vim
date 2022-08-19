@@ -18,4 +18,4 @@ export const Warning = orange600
 export const Hint = violet400
 export const Info = cyan500
 export const Text = gray100
-export const Hover = gray600
+export const Hover = gray400
