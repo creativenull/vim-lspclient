@@ -101,7 +101,7 @@ def MakeBufSignList(buf: number, diagnostics: list<any>): list<any>
     return {
       buffer: buf,
       lnum: lnum,
-      group: 'LSPClient',
+      group: sign.Group,
       name: printf('LSPClientSign%s', QfListSeverity[severity]),
       priority: 100,
     }
@@ -173,7 +173,7 @@ export def HandleRequest(request: any, lspClientConfig: dict<any>): void
 
   # Signs
   # Clear placed signs first
-  sign_unplace('LSPClient', { buffer: buf })
+  sign_unplace(sign.Group, { buffer: buf })
 
   publishedDiagnostics.signs[buf] = MakeBufSignList(buf, diagnostics)
 
@@ -196,7 +196,7 @@ export def HandleRequest(request: any, lspClientConfig: dict<any>): void
   for b in publishedDiagnostics.textprops->keys()
     for propType in publishedDiagnostics.textprops[b]->keys()
       try
-        prop_add_list({ bufnr: buf, type: propType }, publishedDiagnostics.textprops[b][propType])
+        prop_add_list({ bufnr: b->str2nr(10), type: propType }, publishedDiagnostics.textprops[b][propType])
       catch
         continue
       endtry
