@@ -17,6 +17,8 @@ def OnResponse(ch: channel, response: any): void
   if !popupLoadingRef->empty()
     popup.LoadingStop(popupLoadingRef)
   endif
+
+  # WIP: Implementation
 enddef
 
 export def Request(ch: channel, buf: number, context: dict<any>): void
