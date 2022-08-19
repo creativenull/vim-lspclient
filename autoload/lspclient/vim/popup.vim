@@ -72,9 +72,9 @@ export def Notify(message: any, level: string): void
   })
 enddef
 
-export def Cursor(message: any, level: string, opts = {}): void
+export def Cursor(message: any, level: string, opts = {}): number
   if isPopupAtCursorOpen
-    return
+    return -1
   endif
 
   const defaults = {
@@ -91,7 +91,9 @@ export def Cursor(message: any, level: string, opts = {}): void
   }
 
   isPopupAtCursorOpen = true
-  message->popup_atcursor(defaults->extendnew(opts))
+  const winId = message->popup_atcursor(defaults->extendnew(opts))
+
+  return winId
 enddef
 
 export def LoadingStart(): dict<any>
