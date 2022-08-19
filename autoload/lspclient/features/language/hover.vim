@@ -19,6 +19,7 @@ def OnResponse(ch: channel, response: any): void
   endif
 
   const contents = response.result.contents
+  var languageId = ''
 
   if contents->type() == v:t_string
     # string
@@ -43,6 +44,10 @@ def OnResponse(ch: channel, response: any): void
         else
           popupContents->add(item.value)
         endif
+
+        if item->has_key('language')
+          languageId = item.language
+        endif
       else
         if !item->empty()
           # Check if there are \n in the text
@@ -61,7 +66,11 @@ def OnResponse(ch: channel, response: any): void
       endif
     endfor
 
-    popup.Cursor(popupContents, popup.Level.Hover, { maxheight: 5 })
+    const winId = popup.Cursor(popupContents, popup.Level.Hover, { maxheight: 5 })
+
+    if !languageId->empty() && winId != -1
+      setbufvar(winId->winbufnr(), '&filetype', languageId)
+    endif
   endif
 
   if contents->type() == v:t_dict
