@@ -28,6 +28,7 @@ Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-proto
     + `textDocument/definition`
     + `textDocument/typeDefinition`
     + `textDocument/implementation`
+    + `textDocument/hover`
 +  Workspace features 
     + `workspace/configuration`
     + `workspace/didChangeConfiguration`
@@ -75,6 +76,8 @@ nmap <Leader>le <Plug>(lspclient_diagnostics)
 nmap <Leader>lo <Plug>(lspclient_diagnostic_next)
 nmap <Leader>li <Plug>(lspclient_diagnostic_prev)
 nmap <Leader>lw <Plug>(lspclient_diagnostic_hover)
+nmap <Leader>lw <Plug>(lspclient_diagnostic_hover)
+nmap <Leader>lh <Plug>(lspclient_hover)
 ```
 
 ### Enable Debug Logs
