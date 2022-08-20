@@ -18,6 +18,10 @@ def OnResponse(ch: channel, response: any): void
     popup.LoadingStop(popupLoadingRef)
   endif
 
+  if response.result == null
+    return
+  endif
+
   const contents = response.result.contents
   var languageId = ''
 
@@ -68,9 +72,10 @@ def OnResponse(ch: channel, response: any): void
 
     const winId = popup.Cursor(popupContents, popup.Level.Hover, { maxheight: 5 })
 
-    if !languageId->empty() && winId != -1
-      setbufvar(winId->winbufnr(), '&filetype', languageId)
-    endif
+    # WIP: Set a custom filetype for documentation
+    # if !languageId->empty() && winId != -1
+    #   setbufvar(winId->winbufnr(), '&filetype', languageId)
+    # endif
   endif
 
   if contents->type() == v:t_dict
