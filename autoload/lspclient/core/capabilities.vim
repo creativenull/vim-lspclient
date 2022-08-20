@@ -39,7 +39,7 @@ export def Make(partialCapabilities = null_dict): dict<any>
       documentHighlight: { dynamicRegistration: true },
       hover: {
         dynamicRegistration: true,
-        contentFormat: 'markdown',
+        contentFormat: ['plaintext'],
       },
       publishDiagnostics: {
         relatedInformation: true,
