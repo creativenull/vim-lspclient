@@ -34,6 +34,15 @@ nmap <unique> <silent> <Plug>(lspclient_type_definition) <ScriptCmd>lspclient.Go
 command! LSPClientGotoImplementation call lspclient.GotoImplementation()
 nmap <unique> <silent> <Plug>(lspclient_implementation) <ScriptCmd>lspclient.GotoImplementation()<CR>
 
+command! LSPClientFindReferences call lspclient.FindReferences()
+nmap <unique> <silent> <Plug>(lspclient_references) <ScriptCmd>lspclient.FindReferences()<CR>
+
+command! LSPClientReferenceNext call lspclient.ReferenceNext()
+nmap <unique> <silent> <Plug>(lspclient_reference_next) <ScriptCmd>lspclient.ReferenceNext()<CR>
+
+command! LSPClienReferencePrev call lspclient.ReferencePrev()
+nmap <unique> <silent> <Plug>(lspclient_reference_prev) <ScriptCmd>lspclient.ReferencePrev()<CR>
+
 command! LSPClientDiagnostics call lspclient.Diagnostics()
 nmap <unique> <silent> <Plug>(lspclient_diagnostics) <ScriptCmd>lspclient.Diagnostics()<CR>
 

@@ -148,6 +148,22 @@ export def FindReferences(): void
   RequestForEachClient(references.Request, 'referencesProvider')
 enddef
 
+export def ReferenceNext(): void
+  try
+    lnext
+  catch
+    lfirst
+  endtry
+enddef
+
+export def ReferencePrev(): void
+  try
+    lprev
+  catch
+    llast
+  endtry
+enddef
+
 export def DocumentHighlight(): void
   RequestForEachClient(document_highlight.Request, 'documentHighlightProvider')
 enddef
