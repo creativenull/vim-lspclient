@@ -364,7 +364,6 @@ export def LspStartServer(id: string): void
   enddef
 
   def OnStderr(ch: channel, data: any): void
-    logger.PrintError('STDERR : ' .. data->string())
     logger.LogError('STDERR : ' .. data->string())
   enddef
 
@@ -385,6 +384,7 @@ export def LspStartServer(id: string): void
 
   logger.LogInfo('<======= LSP CLIENT LOG START =======>')
   logger.LogInfo('Starting LSP Server: ' .. lspClientConfig.name)
+  logger.PrintInfo('Starting LSP Server: ' .. lspClientConfig.name)
 
   const job = job_start(lspClientConfig.cmd, jobOpts)
   const channel = job_getchannel(job)
