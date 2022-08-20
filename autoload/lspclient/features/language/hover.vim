@@ -18,11 +18,13 @@ def OnResponse(ch: channel, response: any): void
     popup.LoadingStop(popupLoadingRef)
   endif
 
-  if response.result == null
+  const result = response->get('result', {})
+
+  if result->empty()
     return
   endif
 
-  const contents = response.result.contents
+  const contents = result.contents
   var languageId = ''
 
   if contents->type() == v:t_string
