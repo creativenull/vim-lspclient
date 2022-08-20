@@ -72,7 +72,7 @@ def MakeBufQfList(buf: number, diagnostics: list<any>, lspClientConfig: dict<any
     }
 
     # Optional
-    if diagnostic->has_key('code')
+    if diagnostic->has_key('code') && diagnostic.code->type() == v:t_number
       qfItem.nr = diagnostic.code
     endif
 
