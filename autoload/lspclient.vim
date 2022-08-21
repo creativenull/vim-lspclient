@@ -118,7 +118,7 @@ def RequestForEachClient(Callback: func, serverCapability: string): void
       const clientName = GetConfig(clientId).name
 
       popup.LoadingStop(popupLoadingRef)
-      popup.Notify(printf('%s has no capability for `%s`', clientName, providerName), popup.SeverityType.I)
+      popup.Notify(printf('%s: no support for `%s`', clientName, providerName), popup.SeverityType.I)
       continue
     endif
 
