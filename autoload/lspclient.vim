@@ -96,7 +96,7 @@ enddef
 # ---
 
 # Make a callback for every client attached to a buffer
-def RequestForEachClient(Callback: func, serverCapability: string): void
+def RequestFeatureForEachClient(Callback: func, serverCapability: string): void
   const buf = bufnr()
   const registeredClients = lspClients->keys()
 
@@ -129,23 +129,23 @@ def RequestForEachClient(Callback: func, serverCapability: string): void
 enddef
 
 export def GotoDeclaration(): void
-  RequestForEachClient(goto_declaration.Request, 'declarationProvider')
+  RequestFeatureForEachClient(goto_declaration.Request, 'declarationProvider')
 enddef
 
 export def GotoDefinition(): void
-  RequestForEachClient(goto_definition.Request, 'definitionProvider')
+  RequestFeatureForEachClient(goto_definition.Request, 'definitionProvider')
 enddef
 
 export def GotoTypeDefinition(): void
-  RequestForEachClient(goto_type_definition.Request, 'typeDefinitionProvider')
+  RequestFeatureForEachClient(goto_type_definition.Request, 'typeDefinitionProvider')
 enddef
 
 export def GotoImplementation(): void
-  RequestForEachClient(goto_implementation.Request, 'implementationProvider')
+  RequestFeatureForEachClient(goto_implementation.Request, 'implementationProvider')
 enddef
 
 export def FindReferences(): void
-  RequestForEachClient(references.Request, 'referencesProvider')
+  RequestFeatureForEachClient(references.Request, 'referencesProvider')
 enddef
 
 export def ReferenceNext(): void
@@ -165,7 +165,7 @@ export def ReferencePrev(): void
 enddef
 
 export def DocumentHighlight(): void
-  RequestForEachClient(document_highlight.Request, 'documentHighlightProvider')
+  RequestFeatureForEachClient(document_highlight.Request, 'documentHighlightProvider')
 enddef
 
 export def DocumentHighlightClear(): void
@@ -173,7 +173,7 @@ export def DocumentHighlightClear(): void
 enddef
 
 export def Hover(): void
-  RequestForEachClient(hover.Request, 'hoverProvider')
+  RequestFeatureForEachClient(hover.Request, 'hoverProvider')
 enddef
 
 export def DiagnosticPopupAtCursor(): void
