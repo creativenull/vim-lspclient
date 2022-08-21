@@ -41,6 +41,8 @@ Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-proto
     + `textDocument/references`
     + `textDocument/documentHighlight`
     + `textDocument/hover`
+    + `textDocument/codeLens` (WIP)
+    + `codeLens/resolve` (WIP)
 +  Workspace features 
     + `workspace/configuration`
     + `workspace/didChangeConfiguration`

@@ -41,6 +41,7 @@ export def Make(partialCapabilities = null_dict): dict<any>
         dynamicRegistration: true,
         contentFormat: ['plaintext'],
       },
+      codeLens: { dynamicRegistration: false },
       publishDiagnostics: {
         relatedInformation: true,
         tagSupport: { valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated] },

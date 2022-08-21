@@ -48,6 +48,9 @@ command! LSPClientDocumentHighlight call lspclient.DocumentHighlight()
 command! LSPClientDocumentHighlightClear call lspclient.DocumentHighlightClear()
 nmap <unique> <silent> <Plug>(lspclient_document_highlight) <ScriptCmd>lspclient.DocumentHighlight()<CR>
 
+command! LSPClientCodeLens call lspclient.CodeLens()
+nmap <unique> <silent> <Plug>(lspclient_code_lens) <ScriptCmd>lspclient.CodeLens()<CR>
+
 command! LSPClientDiagnostics call lspclient.Diagnostics()
 nmap <unique> <silent> <Plug>(lspclient_diagnostics) <ScriptCmd>lspclient.Diagnostics()<CR>
 
