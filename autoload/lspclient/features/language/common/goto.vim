@@ -127,7 +127,7 @@ export def Request(ch: channel, method: string, buf: number, context: dict<any>)
       line: line - 1,
       character: col - 1,
     },
-    workDoneToken: random.RandomStr(),
+    # workDoneToken: random.RandomStr(),
     # partialResultToken: '',
   }
 

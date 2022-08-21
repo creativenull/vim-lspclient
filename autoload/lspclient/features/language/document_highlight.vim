@@ -63,7 +63,7 @@ export def Request(ch: channel, buf: number, context: dict<any>): void
       line: line - 1,
       character: col - 1,
     },
-    workDoneToken: random.RandomStr(),
+    # workDoneToken: random.RandomStr(),
     # partialResultToken: '',
   }
 
