@@ -111,8 +111,8 @@ def RequestForEachClient(Callback: func, serverCapability: string): void
       continue
     endif
 
-    const capabilityProvider = GetServerCapabilities(clientId)->get(serverCapability)
-    if capabilityProvider->type() == v:t_number
+    const serverCapabilities = GetServerCapabilities(clientId)
+    if !serverCapabilities->has_key(serverCapability)
       const [_, startIdx, _] = serverCapability->matchstrpos('Provider')
       const providerName = serverCapability[0 : startIdx - 1]
       const clientName = GetConfig(clientId).name
