@@ -14,31 +14,31 @@ export def Make(partialCapabilities = null_dict): dict<any>
     },
     textDocument: {
       synchronization: {
-        dynamicRegistration: true,
+        dynamicRegistration: false,
         willSave: true,
         willSaveWaitUntil: true,
         didSave: true,
       },
       declaration: {
-        dynamicRegistration: true,
+        dynamicRegistration: false,
         linkSupport: true,
       },
       definition: {
-        dynamicRegistration: true,
+        dynamicRegistration: false,
         linkSupport: true,
       },
       typeDefinition: {
-        dynamicRegistration: true,
+        dynamicRegistration: false,
         linkSupport: true,
       },
       implementation: {
-        dynamicRegistration: true,
+        dynamicRegistration: false,
         linkSupport: true,
       },
-      references: { dynamicRegistration: true },
-      documentHighlight: { dynamicRegistration: true },
+      references: { dynamicRegistration: false },
+      documentHighlight: { dynamicRegistration: false },
       hover: {
-        dynamicRegistration: true,
+        dynamicRegistration: false,
         contentFormat: ['plaintext'],
       },
       codeLens: { dynamicRegistration: false },
