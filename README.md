@@ -28,6 +28,8 @@ Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-proto
     + `textDocument/definition`
     + `textDocument/typeDefinition`
     + `textDocument/implementation`
+    + `textDocument/references`
+    + `textDocument/documentHighlight`
     + `textDocument/hover`
 +  Workspace features 
     + `workspace/configuration`
@@ -70,12 +72,15 @@ git clone https://github.com/creativenull/vim-lspclient.git ~/.vim/pack/creative
 " Example keymaps
 nmap <Leader>lgd <Plug>(lspclient_definition)
 nmap <Leader>lge <Plug>(lspclient_declaration)
-nmap <Leader>lgi <Plug>(lspclient_implementation)
 nmap <Leader>lgt <Plug>(lspclient_type_definition)
-nmap <Leader>le <Plug>(lspclient_diagnostics)
-nmap <Leader>lo <Plug>(lspclient_diagnostic_next)
-nmap <Leader>li <Plug>(lspclient_diagnostic_prev)
-nmap <Leader>lw <Plug>(lspclient_diagnostic_hover)
+nmap <Leader>lgi <Plug>(lspclient_implementation)
+nmap <Leader>lr <Plug>(lspclient_references)
+nmap <Leader>lro <Plug>(lspclient_reference_next)
+nmap <Leader>lri <Plug>(lspclient_reference_prev)
+nmap <Leader>li <Plug>(lspclient_document_highlight)
+nmap <Leader>ld <Plug>(lspclient_diagnostics)
+nmap <Leader>ldo <Plug>(lspclient_diagnostic_next)
+nmap <Leader>ldi <Plug>(lspclient_diagnostic_prev)
 nmap <Leader>lw <Plug>(lspclient_diagnostic_hover)
 nmap <Leader>lh <Plug>(lspclient_hover)
 ```
@@ -174,4 +179,32 @@ let s:denols.settings = { 'enable': v:true, 'unstable': v:true }
 let s:denols.markers = ['deno.json', 'deno.jsonc']
 
 call lspclient#Create(s:denols)
+```
+
+#### Rust
+
+Must have `rust-analyzer` installed globally.
+
+```vim
+let s:rust_analyzer = {}
+let s:rust_analyzer.name = 'rust_analyzer'
+let s:rust_analyzer.cmd = ['rust-analyzer']
+let s:rust_analyzer.filetypes = ['rust']
+let s:rust_analyzer.markers = ['Cargo.toml']
+
+call lspclient#Create(s:rust_analyzer)
+```
+
+#### Go
+
+Must have `gopls` installed globally.
+
+```vim
+let s:gopls = {}
+let s:gopls.name = 'gopls'
+let s:gopls.cmd = ['gopls']
+let s:gopls.filetypes = ['go', 'gomod']
+let s:gopls.markers = ['go.mod']
+
+call lspclient#Create(s:gopls)
 ```
