@@ -1,12 +1,22 @@
 # vim-lspclient (WIP)
 
-A highly experimental LSP client for vim using the builtin [LSP channel mode](https://vimhelp.org/channel.txt.html#language-server-protocol).
+A highly experimental LSP client for VIM using the builtin [LSP channel mode](https://vimhelp.org/channel.txt.html#language-server-protocol).
 Written in `vim9script`.
 
 ## Motivation
 
-I just wanted to try out a new language, at the same time, wanted to challenge myself on building something different/
-unique besides just building web applications.
+I just wanted to try out the new `vim9script` language, at the same time, wanted to challenge myself on building something
+different/unique besides just building web applications.
+
+At this moment, this plugin is just a toy project for me to play around with LSP and what features I could possibly
+implement/contribute to different plugins that already do something similar.
+
+The aim for this LSP client is to be:
+
++ Portable: use as much of built-in VIM features as possible, write any custom wrappers in case a feature is needed.
++ Efficient: find ways to display important info and make it easy for the users to access this info.
++ Aesthetics: make displaying info as aesthetically pleasing as possible but still out of the way of distractions if needed.
++ Performance: not really a high aim for now, but eventually will get there in small increments.
 
 ## What works
 
@@ -43,14 +53,16 @@ Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-proto
     + `window/workDoneProgress/cancel` (WIP)
 
 ## Installation
+
 ### Requirements
 
 The following version and features are required, these can also be checked with `:LSPClientCheckHealth`:
 
-+ Vim [v8.2.4758](https://github.com/vim/vim/tree/v8.2.4758) and up is required.
++ VIM [v8.2.4758](https://github.com/vim/vim/tree/v8.2.4758) and up or VIM [9](https://github.com/vim/vim/tree/v9.0.0000) and up is required.
 + `+channel`
 + `+job`
 + `+timers`
++ `+popupwin`
 
 ### Install via plugin manager
 
@@ -104,7 +116,7 @@ let s:tsserver = {}
 let s:tsserver.name = 'tsserver'
 let s:tsserver.cmd = ['typescript-language-server', '--stdio']
 let s:tsserver.filetypes = ['typescript', 'typescriptreact', 'javascript', 'javascriptreact']
-let s:tsserver.initOptions = { 'hostInfo': 'Vim 9' }
+let s:tsserver.initOptions = { 'hostInfo': 'VIM 9' }
 let s:tsserver.markers = ['tsconfig.json', 'jsconfig.json', 'package.json']
 
 call lspclient#Create(s:tsserver)
