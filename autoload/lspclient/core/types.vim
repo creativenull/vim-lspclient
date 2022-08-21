@@ -21,6 +21,15 @@ export const DiagnosticSeverity = {
   4: 'H',
 }
 
+export const DocumentHighlightKind = {
+  1: 'Text',
+  2: 'Read',
+  3: 'Write',
+  Text: 1,
+  Read: 2,
+  Write: 3,
+}
+
 export const PositionEncodingKind = {
   UTF8: 'utf-8',
   UTF16: 'utf-16',

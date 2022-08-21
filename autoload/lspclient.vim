@@ -168,6 +168,10 @@ export def DocumentHighlight(): void
   RequestForEachClient(document_highlight.Request, 'documentHighlightProvider')
 enddef
 
+export def DocumentHighlightClear(): void
+  document_highlight.Clear()
+enddef
+
 export def Hover(): void
   RequestForEachClient(hover.Request, 'hoverProvider')
 enddef

@@ -15,6 +15,7 @@ import autoload 'lspclient/vim/checkhealth.vim'
 import autoload 'lspclient/vim/popup.vim'
 import autoload 'lspclient/vim/sign.vim'
 import autoload 'lspclient/vim/textprop.vim'
+import autoload 'lspclient/features/language/document_highlight.vim'
 
 command! LSPClientCheckHealth call checkhealth.Info()
 
@@ -43,6 +44,10 @@ nmap <unique> <silent> <Plug>(lspclient_reference_next) <ScriptCmd>lspclient.Ref
 command! LSPClienReferencePrev call lspclient.ReferencePrev()
 nmap <unique> <silent> <Plug>(lspclient_reference_prev) <ScriptCmd>lspclient.ReferencePrev()<CR>
 
+command! LSPClientDocumentHighlight call lspclient.DocumentHighlight()
+command! LSPClientDocumentHighlightClear call lspclient.DocumentHighlightClear()
+nmap <unique> <silent> <Plug>(lspclient_document_highlight) <ScriptCmd>lspclient.DocumentHighlight()<CR>
+
 command! LSPClientDiagnostics call lspclient.Diagnostics()
 nmap <unique> <silent> <Plug>(lspclient_diagnostics) <ScriptCmd>lspclient.Diagnostics()<CR>
 
@@ -68,5 +73,8 @@ sign.DefineSigns()
 # Text props
 textprop.DefineHighlights()
 textprop.DefineTextProps()
+
+# Document highlight
+document_highlight.DefineHighlights()
 
 g:loaded_lspclient = true

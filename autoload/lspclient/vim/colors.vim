@@ -11,6 +11,7 @@ const gray100 = '#f3f4f6'
 const gray200 = '#e5e7eb'
 const gray400 = '#9ca3af'
 const gray600 = '#4b5563'
+const fuchsia900 = '#701a75'
 
 # Severity colors
 export const Error = rose600
@@ -19,3 +20,5 @@ export const Hint = violet400
 export const Info = cyan500
 export const Text = gray100
 export const Hover = gray400
+export const DocumentHighlightBg = fuchsia900
+export const DocumentHighlightFg = gray100
