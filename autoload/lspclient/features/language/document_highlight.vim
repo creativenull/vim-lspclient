@@ -12,23 +12,32 @@ const method = 'textDocument/documentHighlight'
 var popupLoadingRef = {}
 var matchedRef: number = -1
 
-def OnResponse(ch: channel, response: any): void
-  logger.LogDebug(printf('Got Response `%s`: %s', method, response->string()))
+export def Clear(): void
+  if matchedRef != -1
+    matchdelete(matchedRef)
+    matchedRef = -1
+  endif
+enddef
 
+def OnResponse(ch: channel, response: any): void
+  const buf = bufnr()
   const result = response->get('result', [])
 
-  if result->empty()
-    return
-  endif
+  logger.LogDebug(printf('Got Response `%s`: %s', method, response->string()))
 
   # Clear loading window
   if !popupLoadingRef->empty()
     popup.LoadingStop(popupLoadingRef)
   endif
 
-  const buf = bufnr()
-  var positions = []
+  # Clear highlights
+  Clear()
 
+  if result->empty()
+    return
+  endif
+
+  var positions = []
   for documentHighlight in result
     const lineNum = documentHighlight.range.start.line + 1
     const col = documentHighlight.range.start.character + 1
@@ -60,13 +69,6 @@ export def Request(ch: channel, buf: number, context: dict<any>): void
 
   protocol.RequestAsync(ch, method, params, OnResponse)
   logger.LogDebug(printf('Request `%s`: %s', method, params->string()))
-enddef
-
-export def Clear(): void
-  if matchedRef != -1
-    matchdelete(matchedRef)
-    matchedRef = -1
-  endif
 enddef
 
 export def DefineHighlights(): void
