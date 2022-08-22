@@ -51,6 +51,9 @@ nmap <unique> <silent> <Plug>(lspclient_document_highlight) <ScriptCmd>lspclient
 command! LSPClientCodeLens call lspclient.CodeLens()
 nmap <unique> <silent> <Plug>(lspclient_code_lens) <ScriptCmd>lspclient.CodeLens()<CR>
 
+command! LSPClientDocumentSymbols call lspclient.DocumentSymbols()
+nmap <unique> <silent> <Plug>(lspclient_document_symbols) <ScriptCmd>lspclient.DocumentSymbols()<CR>
+
 command! LSPClientDiagnostics call lspclient.Diagnostics()
 nmap <unique> <silent> <Plug>(lspclient_diagnostics) <ScriptCmd>lspclient.Diagnostics()<CR>
 

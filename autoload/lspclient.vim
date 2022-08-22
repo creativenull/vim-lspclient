@@ -7,6 +7,7 @@ import './lspclient/logger.vim'
 import './lspclient/router.vim'
 import './lspclient/config.vim'
 import './lspclient/features/language/code_lens.vim'
+import './lspclient/features/language/document_symbols.vim'
 import './lspclient/features/language/goto_declaration.vim'
 import './lspclient/features/language/goto_definition.vim'
 import './lspclient/features/language/goto_type_definition.vim'
@@ -179,6 +180,10 @@ enddef
 
 export def CodeLens(): void
   RequestFeatureForEachClient(code_lens.Request, 'codeLensProvider')
+enddef
+
+export def DocumentSymbols(): void
+  RequestFeatureForEachClient(document_symbols.Request, 'documentSymbolProvider')
 enddef
 
 export def DiagnosticPopupAtCursor(): void

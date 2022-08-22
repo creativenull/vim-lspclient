@@ -4,6 +4,8 @@ import './types.vim'
 
 const DiagnosticTag = types.DiagnosticTag
 const PositionEncodingKind = types.PositionEncodingKind
+const SymbolKind = types.SymbolKind
+const SymbolTag = types.SymbolTag
 
 export def Make(partialCapabilities = null_dict): dict<any>
   const defaults = {
@@ -42,6 +44,14 @@ export def Make(partialCapabilities = null_dict): dict<any>
         contentFormat: ['plaintext'],
       },
       codeLens: { dynamicRegistration: false },
+      documentSymbol: {
+        dynamicRegistration: false,
+        hierarchicalDocumentSymbolSupport: true,
+        # All symbol kinds
+        symbolKind: { valueSet: SymbolKind->keys()->mapnew((i, kind) => SymbolKind[kind]) },
+        tagSupport: { valueSet: [SymbolTag.Deprecated] },
+        labelSupport: true,
+      },
       publishDiagnostics: {
         relatedInformation: true,
         tagSupport: { valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated] },
