@@ -2,15 +2,15 @@ vim9script
 
 # Base functions to initialize and shutdown the LSP client
 
-import './protocol.vim'
-import './capabilities.vim'
+import '../features/workspace/workspace_folders.vim'
 import '../fs.vim'
 import '../logger.vim'
-import '../features/workspace/workspace_folders.vim'
+import './capabilities.vim'
+import './protocol.vim'
 
 const locale = 'en-US'
 const clientInfo = {
-  name: 'Vim',
+  name: 'VIM',
   version: v:versionlong->string(),
 }
 
@@ -22,14 +22,14 @@ export def Initialize(
   const clientCapabilities = capabilities.Make(opts.lspClientConfig.capabilities)
   const initializationOptions = opts.lspClientConfig.initOptions
   const params = {
-    processId: getpid(),
-    locale: locale,
-    clientInfo: clientInfo,
-    rootUri: fs.GetProjectRootUri(),
-    workspaceFolders: workspace_folders.GetWorkspaceFolders(),
-    trace: 'verbose',
-    initializationOptions: initializationOptions,
     capabilities: clientCapabilities,
+    clientInfo: clientInfo,
+    initializationOptions: initializationOptions,
+    locale: locale,
+    processId: getpid(),
+    rootUri: fs.GetProjectRootUri(),
+    trace: 'verbose',
+    workspaceFolders: workspace_folders.GetWorkspaceFolders(),
   }
 
   protocol.RequestAsync(ch, 'initialize', params, opts.callback)
