@@ -8,6 +8,7 @@ import '../../vim/popup.vim'
 
 const method = 'textDocument/hover'
 
+const PopupLevel = popup.Level
 var popupLoadingRef = {}
 
 def OnResponse(ch: channel, response: any): void
@@ -29,7 +30,7 @@ def OnResponse(ch: channel, response: any): void
 
   if contents->type() == v:t_string
     # string
-    popup.Cursor(contents, popup.Level.Hover)
+    popup.Cursor(contents, PopupLevel.Hover)
   endif
 
   if contents->type() == v:t_list
@@ -72,7 +73,7 @@ def OnResponse(ch: channel, response: any): void
       endif
     endfor
 
-    const winId = popup.Cursor(popupContents, popup.Level.Hover, { maxheight: 5 })
+    const winId = popup.Cursor(popupContents, PopupLevel.Hover, { maxheight: 5 })
 
     # WIP: Set a custom filetype for documentation
     # if !languageId->empty() && winId != -1
@@ -81,12 +82,38 @@ def OnResponse(ch: channel, response: any): void
   endif
 
   if contents->type() == v:t_dict
-    if !contents->get('language', '')->empty()
+    if !contents->has_key('language')
       # MarkupString type
+      var markupContents = []
+
+      if contents.value->match("\n") != -1
+        const values = contents.value->split("\n")
+
+        for val in values
+          markupContents->add(val)
+        endfor
+
+        popup.Cursor(markupContents, PopupLevel.Hover)
+      else
+        popup.Cursor(contents.value, PopupLevel.Hover)
+      endif
     endif
 
-    if !contents->get('kind', '')->empty()
+    if !contents->has_key('kind')
       # MarkupContent type
+      var markupContents = []
+
+      if contents.value->match("\n") != -1
+        const values = contents.value->split("\n")
+
+        for val in values
+          markupContents->add(val)
+        endfor
+
+        popup.Cursor(markupContents, PopupLevel.Hover)
+      else
+        popup.Cursor(contents.value, PopupLevel.Hover)
+      endif
     endif
   endif
 enddef
