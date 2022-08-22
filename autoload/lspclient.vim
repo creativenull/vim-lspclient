@@ -26,6 +26,7 @@ const didSaveBufEvents = ['BufWrite']
 
 # interface LspClient {
 #   id: number
+#   ready: bool
 #   group: string
 #   config: dict<any>
 #   job: job
@@ -85,13 +86,17 @@ def RemoveDocument(id: string, buf: number): dict<any>
   return null_dict
 enddef
 
-def IsAttachedToBuffers(id: string, buf: number): bool
+def LSPClientIsAttachedToBuffer(id: string, buf: number): bool
   const results = filter(GetDocuments(id)->copy(), (i, val) => val.bufnr == buf)
   return !results->empty()
 enddef
 
 def IsChannelConnected(ch: channel): bool
   return ch->ch_status() == 'open'
+enddef
+
+def LSPClientIsReady(id: string, buf: number): bool
+  return lspClients[id].ready && LSPClientIsAttachedToBuffer(id, buf)
 enddef
 
 # Language Features
@@ -106,8 +111,6 @@ def RequestFeatureForEachClient(Callback: func, serverCapability: string): void
     return
   endif
 
-  const popupLoadingRef = popup.LoadingStart()
-
   for clientId in registeredClients
     if !IsChannelConnected(GetChannel(clientId))
       continue
@@ -119,13 +122,18 @@ def RequestFeatureForEachClient(Callback: func, serverCapability: string): void
       const providerName = serverCapability[0 : startIdx - 1]
       const clientName = GetConfig(clientId).name
 
-      popup.LoadingStop(popupLoadingRef)
       popup.Notify(printf('%s: no support for `%s`', clientName, providerName), popup.SeverityType.I)
+
       continue
     endif
 
-    if IsAttachedToBuffers(clientId, buf)
+    if LSPClientIsReady(clientId, buf)
+      const popupLoadingRef = popup.LoadingStart()
       Callback(GetChannel(clientId), buf, { popupLoadingRef: popupLoadingRef })
+
+      # TODO: For now just run request for the first client attached, try to
+      # find ways to handle for multiple servers, eg tsserver + diagnosticls
+      break
     endif
   endfor
 enddef
@@ -377,6 +385,10 @@ export def LspStartServer(id: string): void
     # Open the current document
     DocumentDidOpen(id)
 
+    # Ready the server
+    lspClients[id].ready = true
+    logger.PrintInfo('LSP Ready: ' .. GetConfig(id).name)
+
     # Let future buffers know about the open document event
     autocmd_add([
       {
@@ -414,7 +426,6 @@ export def LspStartServer(id: string): void
 
   logger.LogInfo('<======= LSP CLIENT LOG START =======>')
   logger.LogInfo('Starting LSP Server: ' .. lspClientConfig.name)
-  logger.PrintInfo('Starting LSP Server: ' .. lspClientConfig.name)
 
   const job = job_start(lspClientConfig.cmd, jobOpts)
   const channel = job_getchannel(job)
@@ -453,6 +464,7 @@ export def Create(partialLspClientConfig: dict<any>): void
   const id = lspClientConfig.name
   var lspClient = {
     id: id,
+    ready: false,
     group: printf('LspClient_%s', id),
     config: lspClientConfig,
     job: null_job,
