@@ -12,6 +12,25 @@ import './features/workspace/configuration.vim'
 import './features/workspace/workspace_folders.vim'
 import './logger.vim'
 
+# Handle dynamic registrations issued by the server
+def HandleRegisterCapability(ch: channel, request: dict<any>, lspClientConfig: dict<any>): void
+  const registrations = request.params.registrations
+
+  for registration in registrations
+    if registration.method == 'workspace/didChangeConfiguration'
+      configuration.Register(ch, request, lspClientConfig)
+    elseif registration.method == 'textDocument/declaration'
+      goto_declaration.Register(ch, registration, lspClientConfig)
+    elseif registration.method == 'textDocument/definition'
+      goto_definition.Register(ch, registration, lspClientConfig)
+    elseif registration.method == 'textDocument/typeDefinition'
+      goto_type_definition.Register(ch, registration, lspClientConfig)
+    elseif registration.method == 'textDocument/implementation'
+      goto_implementation.Register(ch, registration, lspClientConfig)
+    endif
+  endfor
+enddef
+
 export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig: dict<any>): void
   if request->has_key('error')
     logger.LogError(request->string())
@@ -45,30 +64,9 @@ export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig:
   endif
 
   if request.method == 'client/registerCapability'
-    const registrations = request.params.registrations
+    HandleRegisterCapability(ch, request, lspClientConfig)
 
-    # Handle dynamicRegistration requests
-    for registration in registrations->copy()
-      if registration.method == 'workspace/didChangeConfiguration'
-        configuration.Register(ch, request, lspClientConfig)
-      endif
-
-      if registration.method == 'textDocument/declaration'
-        goto_declaration.Register(ch, registration, lspClientConfig)
-      endif
-
-      if registration.method == 'textDocument/definition'
-        goto_definition.Register(ch, registration, lspClientConfig)
-      endif
-
-      if registration.method == 'textDocument/typeDefinition'
-        goto_type_definition.Register(ch, registration, lspClientConfig)
-      endif
-
-      if registration.method == 'textDocument/implementation'
-        goto_implementation.Register(ch, registration, lspClientConfig)
-      endif
-    endfor
+    return
   endif
 
   # Window
