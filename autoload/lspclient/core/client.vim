@@ -22,12 +22,13 @@ export def Initialize(
   const clientCapabilities = capabilities.Make(opts.lspClientConfig.capabilities)
   const initializationOptions = opts.lspClientConfig.initOptions
   const params = {
-    capabilities: clientCapabilities,
-    clientInfo: clientInfo,
-    initializationOptions: initializationOptions,
-    locale: locale,
     processId: getpid(),
+    clientInfo: clientInfo,
+    locale: locale,
+    rootPath: null,
     rootUri: fs.GetProjectRootUri(),
+    initializationOptions: initializationOptions,
+    capabilities: clientCapabilities,
     trace: 'verbose',
     workspaceFolders: workspace_folders.GetWorkspaceFolders(),
   }
