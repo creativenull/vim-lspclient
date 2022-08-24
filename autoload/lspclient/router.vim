@@ -78,13 +78,13 @@ export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig:
   endif
 
   if request.method == 'window/showMessage'
-    message.HandleShowMessage(request)
+    message.Show(request)
 
     return
   endif
 
   if request.method == 'window/logMessage'
-    message.HandleLogMessage(request)
+    message.Log(request)
 
     return
   endif

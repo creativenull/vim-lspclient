@@ -37,14 +37,18 @@ export def HandleShowMessageRequest(ch: channel, request: any, lspClientConfig: 
   endif
 enddef
 
-export def HandleShowMessage(request: any): void
+export def Show(request: any): void
   const params = request.params
-  logger.Print(MessageType[params.type], params.message)
-  # popup.Notify(params.message, MessageType[params.type])
+
+  execute printf('echohl LSPClientText%s', MessageType[params.type])
+  logger.Print(MessageType[params.type]->toupper(), params.message->string()->trim())
+  echohl NONE
 enddef
 
-export def HandleLogMessage(request: any): void
+export def Log(request: any): void
   const params = request.params
-  logger.Log(MessageType[params.type]->toupper(), params.message)
-  # popup.Notify(params.message, MessageType[params.type])
+
+  execute printf('echohl LSPClientText%s', MessageType[params.type])
+  logger.Print(MessageType[params.type]->toupper(), params.message->string()->trim())
+  echohl NONE
 enddef

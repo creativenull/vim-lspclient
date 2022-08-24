@@ -10,12 +10,13 @@ if exists('g:loaded_lspclient')
 endif
 
 import autoload 'lspclient.vim'
+import autoload 'lspclient/features/language/document_highlight.vim'
 import autoload 'lspclient/logger.vim'
 import autoload 'lspclient/vim/checkhealth.vim'
+import autoload 'lspclient/vim/colors.vim'
 import autoload 'lspclient/vim/popup.vim'
 import autoload 'lspclient/vim/sign.vim'
 import autoload 'lspclient/vim/textprop.vim'
-import autoload 'lspclient/features/language/document_highlight.vim'
 
 command! LSPClientCheckHealth call checkhealth.Info()
 
@@ -68,6 +69,21 @@ nmap <unique> <silent> <Plug>(lspclient_diagnostic_hover) <ScriptCmd>lspclient.D
 
 command! LSPClientHover call lspclient.Hover()
 nmap <unique> <silent> <Plug>(lspclient_hover) <ScriptCmd>lspclient.Hover()<CR>
+
+def DefineHighlights(): void
+  hlset([
+    { name: 'LSPClientTextError', guifg: colors.Error, guibg: 'NONE' },
+    { name: 'LSPClientTextWarning', guifg: colors.Warning, guibg: 'NONE' },
+    { name: 'LSPClientTextInfo', guifg: colors.Info, guibg: 'NONE' },
+    { name: 'LSPClientTextHint', guifg: colors.Hint, guibg: 'NONE' },
+    { name: 'LSPClientFillError', guifg: colors.Text, guibg: colors.Error },
+    { name: 'LSPClientFillWarning', guifg: colors.Text, guibg: colors.Warning },
+    { name: 'LSPClientFillInfo', guifg: colors.Text, guibg: colors.Info },
+    { name: 'LSPClientFillHint', guifg: colors.Text, guibg: colors.Hint },
+  ])
+enddef
+
+DefineHighlights()
 
 # Popup Highlights
 popup.DefineHighlights()
