@@ -12,7 +12,20 @@ import './features/workspace/configuration.vim'
 import './features/workspace/workspace_folders.vim'
 import './logger.vim'
 
-export def HandleServerRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
+export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig: dict<any>): void
+  if request->has_key('error')
+    logger.LogError(request->string())
+    logger.PrintError(printf('[code: %d] `%s`', request.error.code, request.error.message))
+
+    return
+  endif
+
+  if !request->has_key('method')
+    return
+  endif
+
+  logger.LogDebug('STDOUT: ' .. request->string())
+
   if request.method == 'workspace/configuration'
     configuration.HandleConfigurationRequest(ch, request, lspClientConfig)
 
