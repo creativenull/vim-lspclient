@@ -401,7 +401,6 @@ export def LspStartServer(id: string): void
   enddef
 
   def OnStdout(ch: channel, data: any): void
-    logger.LogDebug('STDOUT : ' .. data->string())
     router.HandleServerRequest(ch, data, GetConfig(id))
   enddef
 
@@ -409,8 +408,8 @@ export def LspStartServer(id: string): void
     logger.LogError('STDERR : ' .. data->string())
   enddef
 
-  def OnExit(ch: channel): void
-    logger.PrintInfo('Job Exiting')
+  def OnExit(jb: job, status: any): void
+    logger.LogDebug('Job Exiting')
   enddef
 
   const jobOpts = {
