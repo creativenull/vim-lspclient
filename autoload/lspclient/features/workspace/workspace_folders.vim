@@ -13,7 +13,7 @@ export def GetWorkspaceFolders(): list<any>
   ]
 enddef
 
-export def HandleWorkspaceFoldersRequest(ch: channel, request: any): void
+export def HandleRequest(ch: channel, request: any): void
   const result = GetWorkspaceFolders()
   protocol.ResponseAsync(ch, request.id, result)
   logger.LogDebug('Response workspace/workspaceFolders: ' .. result->string())

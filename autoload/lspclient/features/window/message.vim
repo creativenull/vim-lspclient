@@ -17,7 +17,7 @@ const MakeConfirmActionChoices = (actions: list<any>): string =>
 
 # Prompt user with an action choice via confirm() and then respond back to the
 # LSP server with the selected action
-export def HandleShowMessageRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
+export def HandleRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
   logger.LogDebug('Request `window/showMessageRequest`: ' .. request->string())
 
   const params = request.params
@@ -37,7 +37,7 @@ export def HandleShowMessageRequest(ch: channel, request: any, lspClientConfig: 
   endif
 enddef
 
-export def Show(request: any): void
+def ShowMessage(request: any): void
   const params = request.params
 
   execute printf('echohl LSPClientText%s', MessageType[params.type])
@@ -45,10 +45,20 @@ export def Show(request: any): void
   echohl NONE
 enddef
 
-export def Log(request: any): void
+def LogMessage(request: any): void
   const params = request.params
 
   execute printf('echohl LSPClientText%s', MessageType[params.type])
   logger.Print(MessageType[params.type]->toupper(), params.message->string()->trim())
   echohl NONE
+enddef
+
+export def HandleNotification(request: dict<any>): void
+  if request.method == 'window/showMessage'
+    ShowMessage(request)
+  endif
+
+  if request.method == 'window/logMessage'
+    LogMessage(request)
+  endif
 enddef

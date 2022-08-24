@@ -13,7 +13,7 @@ import './features/workspace/workspace_folders.vim'
 import './logger.vim'
 
 # Handle dynamic registrations issued by the server
-def HandleRegisterCapability(ch: channel, request: dict<any>, lspClientConfig: dict<any>): void
+def HandleRegisterCapabilityRequest(ch: channel, request: dict<any>, lspClientConfig: dict<any>): void
   const registrations = request.params.registrations
 
   for registration in registrations
@@ -46,13 +46,13 @@ export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig:
   logger.LogDebug('STDOUT: ' .. request->string())
 
   if request.method == 'workspace/configuration'
-    configuration.HandleConfigurationRequest(ch, request, lspClientConfig)
+    configuration.HandleRequest(ch, request, lspClientConfig)
 
     return
   endif
 
   if request.method == 'workspace/workspaceFolders'
-    workspace_folders.HandleWorkspaceFoldersRequest(ch, request)
+    workspace_folders.HandleRequest(ch, request)
 
     return
   endif
@@ -64,7 +64,7 @@ export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig:
   endif
 
   if request.method == 'client/registerCapability'
-    HandleRegisterCapability(ch, request, lspClientConfig)
+    HandleRegisterCapabilityRequest(ch, request, lspClientConfig)
 
     return
   endif
@@ -72,25 +72,19 @@ export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig:
   # Window
   # --
   if request.method == 'window/showMessageRequest'
-    message.HandleShowMessageRequest(ch, request, lspClientConfig)
+    message.HandleRequest(ch, request, lspClientConfig)
 
     return
   endif
 
-  if request.method == 'window/showMessage'
-    message.Show(request)
-
-    return
-  endif
-
-  if request.method == 'window/logMessage'
-    message.Log(request)
+  if request.method == 'window/showMessage' || request.method == 'window/logMessage'
+    message.HandleNotification(request)
 
     return
   endif
 
   if request.method == 'window/workDoneProgress/create'
-    work_done.Create(ch, request)
+    work_done.HandleRequest(ch, request)
 
     return
   endif

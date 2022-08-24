@@ -3,7 +3,7 @@ vim9script
 import '../../logger.vim'
 import '../../core/protocol.vim'
 
-export def HandleConfigurationRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
+export def HandleRequest(ch: channel, request: any, lspClientConfig: dict<any>): void
   protocol.ResponseAsync(ch, request.id, [lspClientConfig.settings])
   logger.LogDebug('Response `workspace/configuration`: ' .. lspClientConfig.settings->string())
 enddef
