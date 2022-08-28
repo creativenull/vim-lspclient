@@ -14,6 +14,12 @@ export def Make(partialCapabilities = null_dict): dict<any>
       didChangeConfiguration: { dynamicRegistration: true },
       configuration: true,
       workspaceFolders: true,
+      symbol: {
+        dynamicRegistration: false,
+        symbolKind: { valueSet: SymbolKind->keys()->mapnew((i, kind) => SymbolKind[kind]) },
+        tagSupport: { valueSet: SymbolTag->keys()->mapnew((i, tag) => SymbolTag[tag]) },
+        # resolveSupport: { properties: [] },
+      },
     },
     textDocument: {
       synchronization: {

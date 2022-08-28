@@ -15,6 +15,7 @@ import './lspclient/features/language/goto_implementation.vim'
 import './lspclient/features/language/references.vim'
 import './lspclient/features/language/document_highlight.vim'
 import './lspclient/features/language/hover.vim'
+import './lspclient/features/workspace/workspace_symbols.vim'
 import './lspclient/vim/popup.vim'
 
 # Events
@@ -245,6 +246,49 @@ export def DiagnosticPrev(): void
   catch
     clast
   endtry
+enddef
+
+# Workspace Features
+# ---
+
+def RequestWorkspaceForEachClient(Callback: func, serverCapability: string): void
+  const buf = bufnr()
+  const registeredClients = lspClients->keys()
+
+  if registeredClients->empty()
+    return
+  endif
+
+  for clientId in registeredClients
+    if !IsChannelConnected(GetChannel(clientId))
+      continue
+    endif
+
+    const serverCapabilities = GetServerCapabilities(clientId)
+    if !serverCapabilities->has_key(serverCapability)
+      const [_, startIdx, _] = serverCapability->matchstrpos('Provider')
+      const providerName = serverCapability[0 : startIdx - 1]
+      const clientName = GetConfig(clientId).name
+
+      popup.Notify(printf('%s: no support for `%s`', clientName, providerName), popup.SeverityType.I)
+
+      continue
+    endif
+
+    if LSPClientIsReady(clientId, buf)
+      Callback(GetChannel(clientId), { lspClientConfig: GetConfig(clientId) })
+
+      # TODO: For now just run request for the first client attached, try to
+      # find ways to handle for multiple servers, eg tsserver + diagnosticls
+      break
+    endif
+  endfor
+enddef
+
+export def WorkspaceSymbols(query: string): void
+  RequestWorkspaceForEachClient((ch: channel, context: dict<any>) => {
+    workspace_symbols.Request(ch, query, context)
+  }, 'workspaceSymbolProvider')
 enddef
 
 # Buffer/Document sync
