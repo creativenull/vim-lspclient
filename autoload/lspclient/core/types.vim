@@ -67,6 +67,12 @@ export const SymbolKind = {
 
 export const SymbolTag = { Deprecated: 1 }
 
+export const FoldingRangeKind = {
+  Comment: 'comment',
+  Imports: 'imports',
+  Region: 'region',
+}
+
 export const LanguageIds = [
   'abap',
   'bat',

@@ -6,6 +6,7 @@ const DiagnosticTag = types.DiagnosticTag
 const PositionEncodingKind = types.PositionEncodingKind
 const SymbolKind = types.SymbolKind
 const SymbolTag = types.SymbolTag
+const FoldingRangeKind = types.FoldingRangeKind
 
 export def Make(partialCapabilities = null_dict): dict<any>
   const defaults = {
@@ -51,6 +52,13 @@ export def Make(partialCapabilities = null_dict): dict<any>
         symbolKind: { valueSet: SymbolKind->keys()->mapnew((i, kind) => SymbolKind[kind]) },
         tagSupport: { valueSet: [SymbolTag.Deprecated] },
         labelSupport: true,
+      },
+      foldingRange: {
+        dynamicRegistration: false,
+        rangeLimit: 100,
+        lineFoldingOnly: true,
+        foldingRangeKind: { valueSet: FoldingRangeKind->keys()->mapnew((i, kind) => FoldingRangeKind[kind]) },
+        foldingRange: { collapsedText: true },
       },
       publishDiagnostics: {
         relatedInformation: true,

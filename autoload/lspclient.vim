@@ -194,6 +194,10 @@ export def DocumentSymbols(): void
   RequestFeatureForEachClient(document_symbols.Request, 'documentSymbolProvider')
 enddef
 
+export def FoldingRange(): void
+  RequestFeatureForEachClient(folding_range.Request, 'foldingRangeProvider')
+enddef
+
 export def DiagnosticPopupAtCursor(): void
   const [_, cursorLineNum, cursorCol, _, _] = getcurpos()
   const buf = bufnr('%')
