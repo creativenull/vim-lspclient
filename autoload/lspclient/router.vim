@@ -19,6 +19,8 @@ def HandleRegisterCapabilityRequest(ch: channel, request: dict<any>, lspClientCo
   for registration in registrations
     if registration.method == 'workspace/didChangeConfiguration'
       configuration.Register(ch, request, lspClientConfig)
+    if registration.method == 'workspace/didChangeWorkspaceFolders'
+      workspace_folders.Register(ch, request, lspClientConfig)
     elseif registration.method == 'textDocument/declaration'
       goto_declaration.Register(ch, registration, lspClientConfig)
     elseif registration.method == 'textDocument/definition'
