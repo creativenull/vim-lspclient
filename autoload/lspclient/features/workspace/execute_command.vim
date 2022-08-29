@@ -21,7 +21,7 @@ enddef
 export def Request(ch: channel, command: string, args: any, context: dict<any>): void
   const params = {
     command: command,
-    arguments: args->empty() ? [] : args,
+    arguments: !args->empty() ? args : null,
   }
 
   protocol.RequestAsync(ch, method, params, OnResponse)
