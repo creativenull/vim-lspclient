@@ -304,7 +304,12 @@ export def ExecuteCommand(rawInput: string): void
   # Collect arguments
   if inputList->len() > 1
     for i in range(1, inputList->len() - 1)
-      args->add(inputList[i])
+      try
+        const jsonData = json_decode(inputList[i])
+        args->add(jsonData)
+      catch
+        args->add(inputList[i])
+      endtry
     endfor
   endif
 
