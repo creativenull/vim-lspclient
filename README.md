@@ -60,7 +60,7 @@ Ref: [LSP Specification v3.17](https://microsoft.github.io/language-server-proto
 
 The following version and features are required, these can also be checked with `:LSPClientCheckHealth`:
 
-+ VIM [v8.2.4758](https://github.com/vim/vim/tree/v8.2.4758) and up or VIM [9](https://github.com/vim/vim/tree/v9.0.0000) and up is required.
++ [VIM v8.2.4758](https://github.com/vim/vim/tree/v8.2.4758) and up or [VIM 9](https://github.com/vim/vim/tree/v9.0.0000) and up is required.
 + `+channel`
 + `+job`
 + `+timers`
