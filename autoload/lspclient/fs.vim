@@ -39,6 +39,10 @@ export def BufferToUri(buf: number): string
   return FileToUri(filepath)
 enddef
 
+export def UriToBuffer(uri: string): number
+  return UriToFile(uri)->bufnr()
+enddef
+
 export def GetProjectRoot(extendPath: string = ''): string
   if !extendPath->empty()
     if extendPath[0] == '/'
