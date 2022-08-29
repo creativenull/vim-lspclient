@@ -16,7 +16,7 @@ import './lspclient/features/language/references.vim'
 import './lspclient/features/language/document_highlight.vim'
 import './lspclient/features/language/hover.vim'
 import './lspclient/features/workspace/workspace_symbols.vim'
-import './lspclient/features/workspace/command.vim'
+import './lspclient/features/workspace/execute_command.vim'
 import './lspclient/vim/popup.vim'
 
 # Events
@@ -309,7 +309,7 @@ export def ExecuteCommand(rawInput: string): void
   endif
 
   RequestWorkspaceForEachClient((ch, context) => {
-    command.Request(ch, cmd, args, context)
+    execute_command.Request(ch, cmd, args, context)
   }, 'executeCommandProvider')
 enddef
 
