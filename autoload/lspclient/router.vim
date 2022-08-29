@@ -8,6 +8,7 @@ import './features/language/goto_type_definition.vim'
 import './features/language/publish_diagnostics.vim'
 import './features/window/message.vim'
 import './features/window/work_done.vim'
+import './features/workspace/apply_edit.vim'
 import './features/workspace/configuration.vim'
 import './features/workspace/workspace_folders.vim'
 import './logger.vim'
@@ -92,7 +93,7 @@ export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig:
   endif
 
   if request.method == 'workspace/applyEdit'
-    logger.LogDebug(printf('Request `%s`: %s', request.method, request->string()))
+    apply_edit.HandleRequest(ch, request)
 
     return
   endif
