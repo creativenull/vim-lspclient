@@ -16,6 +16,7 @@ import './lspclient/features/language/references.vim'
 import './lspclient/features/language/document_highlight.vim'
 import './lspclient/features/language/hover.vim'
 import './lspclient/features/workspace/workspace_symbols.vim'
+import './lspclient/features/workspace/command.vim'
 import './lspclient/vim/popup.vim'
 
 # Events
@@ -289,6 +290,27 @@ export def WorkspaceSymbols(query: string): void
   RequestWorkspaceForEachClient((ch: channel, context: dict<any>) => {
     workspace_symbols.Request(ch, query, context)
   }, 'workspaceSymbolProvider')
+enddef
+
+export def ExecuteCommand(rawInput: string): void
+  if rawInput->empty()
+    return
+  endif
+
+  const inputList = rawInput->split(' ')
+  const cmd = inputList[0]
+  var args = []
+
+  # Collect arguments
+  if inputList->len() > 1
+    for i in range(1, inputList->len() - 1)
+      args->add(inputList[i])
+    endfor
+  endif
+
+  RequestWorkspaceForEachClient((ch, context) => {
+    command.Request(ch, cmd, args, context)
+  }, 'executeCommandProvider')
 enddef
 
 # Buffer/Document sync

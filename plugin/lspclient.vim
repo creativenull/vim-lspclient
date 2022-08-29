@@ -70,6 +70,8 @@ nmap <unique> <silent> <Plug>(lspclient_diagnostic_hover) <ScriptCmd>lspclient.D
 command! LSPClientHover call lspclient.Hover()
 nmap <unique> <silent> <Plug>(lspclient_hover) <ScriptCmd>lspclient.Hover()<CR>
 
+command! -nargs=* LSPClientCommand call lspclient.ExecuteCommand(<q-args>)
+
 def DefineHighlights(): void
   hlset([
     { name: 'LSPClientTextError', guifg: colors.Error, guibg: 'NONE' },

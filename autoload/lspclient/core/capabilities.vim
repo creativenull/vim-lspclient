@@ -20,6 +20,8 @@ export def Make(partialCapabilities = null_dict): dict<any>
         tagSupport: { valueSet: SymbolTag->keys()->mapnew((i, tag) => SymbolTag[tag]) },
         # resolveSupport: { properties: [] },
       },
+      executeCommand: { dynamicRegistration: false },
+      applyEdit: true,
     },
     textDocument: {
       synchronization: {

@@ -19,7 +19,7 @@ export def HandleRequest(ch: channel, request: any): void
   logger.LogDebug('Response workspace/workspaceFolders: ' .. result->string())
 enddef
 
-def Register(ch: channel, request: any, lspClientConfig: dict<any>): void
+export def Register(ch: channel, request: any, lspClientConfig: dict<any>): void
   protocol.ResponseAsync(ch, request.id, {})
   logger.LogDebug('Response Successful Registration `workspace/didChangeWorkspaceFolders`')
 enddef

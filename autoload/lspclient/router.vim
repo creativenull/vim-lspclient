@@ -90,4 +90,10 @@ export def HandleServerRequest(ch: channel, request: dict<any>, lspClientConfig:
 
     return
   endif
+
+  if request.method == 'workspace/applyEdit'
+    logger.LogDebug(printf('Request `%s`: %s', request.method, request->string()))
+
+    return
+  endif
 enddef
