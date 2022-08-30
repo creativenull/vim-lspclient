@@ -148,6 +148,11 @@ enddef
 # Handle diagnostics to show to user
 export def HandleRequest(request: any, lspClientConfig: dict<any>): void
   const buf = bufnr(fs.UriToFile(request.params.uri))
+
+  if !buf->bufloaded()
+    return
+  endif
+
   const diagnostics = request.params->get('diagnostics', [])
 
   if diagnostics->empty()
