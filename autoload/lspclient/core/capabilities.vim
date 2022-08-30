@@ -68,6 +68,7 @@ export def Make(partialCapabilities = null_dict): dict<any>
         foldingRangeKind: { valueSet: FoldingRangeKind->keys()->mapnew((i, kind) => FoldingRangeKind[kind]) },
         foldingRange: { collapsedText: true },
       },
+      formatting: { dynamicRegistration: false },
       publishDiagnostics: {
         relatedInformation: true,
         tagSupport: { valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated] },

@@ -8,6 +8,7 @@ import './lspclient/router.vim'
 import './lspclient/config.vim'
 import './lspclient/features/language/code_lens.vim'
 import './lspclient/features/language/document_symbols.vim'
+import './lspclient/features/language/formatting.vim'
 import './lspclient/features/language/goto_declaration.vim'
 import './lspclient/features/language/goto_definition.vim'
 import './lspclient/features/language/goto_type_definition.vim'
@@ -198,6 +199,10 @@ enddef
 
 export def FoldingRange(): void
   RequestFeatureForEachClient(folding_range.Request, 'foldingRangeProvider')
+enddef
+
+export def Format(): void
+  RequestFeatureForEachClient(formatting.Request, 'documentFormattingProvider')
 enddef
 
 export def DiagnosticPopupAtCursor(): void
