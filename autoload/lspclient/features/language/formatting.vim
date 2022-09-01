@@ -11,7 +11,7 @@ const method = 'textDocument/formatting'
 var popupLoadingRef = {}
 
 def OnResponse(ch: channel, buf: number, response: dict<any>): void
-  logger.LogDebug(printf('Got Response `%s`: %s', method, response->json_encode()))
+  logger.LogDebug(printf('Got Response `%s`: %s', method, response->string()))
 
   # Clear loading window
   if !popupLoadingRef->empty()
